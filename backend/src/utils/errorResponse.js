@@ -13,8 +13,9 @@ class ErrorResponse extends Error {
    * @param {Number} statusCode status code of error
    */
   constructor(message, statusCode) {
-    super(message);
+    super();
     this.statusCode = statusCode;
+    this.message = message;
 
     Error.captureStackTrace(this);
   }

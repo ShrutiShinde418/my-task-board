@@ -7,7 +7,7 @@ const errorHandler = (err, req, res, next) => {
   let error = { ...err };
 
   error.message = err.message;
-  if (err instanceof SyntaxError) {
+  if (err instanceof SyntaxError && "body" in err) {
     req.transactionID = uuidv4();
     req.txnStart = Date.now();
 
@@ -15,7 +15,7 @@ const errorHandler = (err, req, res, next) => {
       createErrorResponse(
         req,
         res,
-        new ErrorResponse(Constants.INVALID_JSON, 400),
+        new ErrorResponse(Constants.INVALID_JSON, 422),
         400
       )
     );

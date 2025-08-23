@@ -7,6 +7,8 @@ import { fileURLToPath } from "url";
 
 import { connectDB } from "./config/db.js";
 import errorHandler from "./middlewares/errorHandler.js";
+import boardRouter from "./routes/boardRouter.js";
+import taskRouter from "./routes/taskRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +23,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
+
+app.use("/api", boardRouter, taskRouter);
 
 app.use(errorHandler);
 
