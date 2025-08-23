@@ -24,7 +24,8 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-app.use("/api", boardRouter, taskRouter);
+app.use("/api", boardRouter);
+app.use("/api", taskRouter);
 
 app.use(errorHandler);
 
