@@ -5,6 +5,7 @@ import ErrorResponse from "../utils/ErrorResponse.js";
 import constants from "../utils/constants.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
+import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
 
 /**
  * Controller to create a new task.
@@ -89,6 +90,8 @@ export const createTaskController = asyncHandler(async (req, res) => {
  */
 export const updateTaskController = asyncHandler(async (req, res) => {
   try {
+    await objectIdRequestMapper(req.params["taskId"], req.transactionId);
+
     const task = await Task.findById(req.params["taskId"]);
 
     if (!task) {
@@ -152,6 +155,8 @@ export const updateTaskController = asyncHandler(async (req, res) => {
  */
 export const deleteTaskController = asyncHandler(async (req, res) => {
   try {
+    await objectIdRequestMapper(req.params["taskId"], req.transactionId);
+
     const deleteTask = await Task.findByIdAndDelete(req.params["taskId"]);
 
     if (!deleteTask) {
