@@ -4,7 +4,7 @@ import {
   getBoardController,
   updateBoardController,
   deleteBoardController,
-} from "../controllers/boardController";
+} from "../controllers/boardController.js";
 
 const router = express.Router();
 

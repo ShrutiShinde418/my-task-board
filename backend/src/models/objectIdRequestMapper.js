@@ -23,12 +23,10 @@ export const objectIdRequestMapper = async (objectId, transactionId) => {
         (val) => {
           return mongoose.Types.ObjectId.isValid(val);
         },
-        { error: "ObjectId passed is invalid" }
+        { error: "ObjectId passed is invalid" },
       );
 
-    const result = await schema.parseAsync(objectId);
-
-    return result;
+    return await schema.parseAsync(objectId);
   } catch (error) {
     handleValidationErrors(error, transactionId);
   }

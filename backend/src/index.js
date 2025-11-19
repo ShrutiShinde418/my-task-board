@@ -9,6 +9,7 @@ import { connectDB } from "./config/db.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import boardRouter from "./routes/boardRouter.js";
 import taskRouter from "./routes/taskRouter.js";
+import authRouter from "./routes/authRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +27,7 @@ app.use(helmet());
 
 app.use("/api", boardRouter);
 app.use("/api", taskRouter);
+app.use("/api", authRouter);
 
 app.use(errorHandler);
 

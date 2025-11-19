@@ -22,10 +22,30 @@ const userSchema = new mongoose.Schema(
       type: [mongoose.Types.ObjectId],
       ref: "Board",
     },
+    isAccountVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verifyOtp: {
+      type: String,
+      default: "",
+    },
+    verifyOtpExpireAt: {
+      type: Date,
+    },
+    resetOtp: {
+      type: String,
+      default: "",
+    },
+    resetOtpExpireAt: {
+      type: Date,
+    },
+    resetPasswordToken: String,
+    resetPasswordExpiresAt: Date,
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.model("User", userSchema);

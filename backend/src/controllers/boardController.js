@@ -1,10 +1,10 @@
-import { asyncHandler } from "../middlewares/asyncHandler";
+import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { z } from "zod";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import constants from "../utils/constants.js";
-import Board from "../models/Board";
+import Board from "../models/Board.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
-import { createSuccessResponse } from "../models/responseMapper";
+import { createSuccessResponse } from "../models/responseMapper.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
 
 /**
