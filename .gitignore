@@ -4,3 +4,4 @@ backend/.env.local
 backend/.env.prod
 .vscode
 .idea
+http-requests

@@ -3,6 +3,7 @@ import path from "path";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url";
 
 import { connectDB } from "./config/db.js";
@@ -22,6 +23,7 @@ dotenv.config({
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 

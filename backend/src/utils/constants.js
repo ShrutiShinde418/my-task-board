@@ -7,4 +7,5 @@ export default Object.freeze({
   USER_ALREADY_EXISTS: "User already exists",
   USER_DOES_NOT_EXIST: "User doesn't exist",
   EMAIL_OR_PASSWORD_IS_INVALID: "Either email or password is invalid",
+  AUTHENTICATION_FAILED: "Authentication failed.",
 });

@@ -2,16 +2,19 @@ import { z } from "zod";
 import constants from "../utils/constants.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
 
-export const authRequestMapper = async (req, res) => {
+export const authRequestMapper = async (req) => {
   try {
     const schema = z.strictObject(
       {
-        email: z.email({
-          pattern: z.regexes.rfc5322Email,
-          error: "Please enter a valid email address.",
-        }),
+        email: z
+          .email({
+            pattern: z.regexes.rfc5322Email,
+            error: "Please enter a valid email address.",
+          })
+          .trim(),
         password: z
           .string()
+          .trim()
           .regex(
             /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
             {
