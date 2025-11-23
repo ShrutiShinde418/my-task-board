@@ -17,9 +17,7 @@ import { v4 } from "uuid";
  * @returns {void} Calls `next()` to continue request processing.
  */
 const startTransaction = (req, res, next) => {
-  const transactionID = v4();
-
-  req.transactionID = transactionID;
+  req.transactionID = v4();
   req.txnStart = Date.now();
 
   next();

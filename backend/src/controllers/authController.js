@@ -75,7 +75,10 @@ export const login = asyncHandler(async (req, res) => {
   try {
     const result = await authRequestMapper(req);
 
-    const existingUser = await User.findOne({ email: result.email });
+    const existingUser = await User.findOne({ email: result.email }).populate({
+      path: "boards",
+      populate: { path: "tasks" },
+    });
 
     if (!existingUser) {
       return res.send(
@@ -123,6 +126,7 @@ export const login = asyncHandler(async (req, res) => {
     return res.send(
       createSuccessResponse(req, res, {
         message: `User with id ${existingUser._id} logged in successfully`,
+        boards: existingUser.boards,
       }),
     );
   } catch (error) {

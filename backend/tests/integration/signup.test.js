@@ -266,7 +266,7 @@ describe("Integration Tests for signup controller", () => {
     it("should fail to signup user when request has unknown parameters", async () => {
       const requestBody = {
         email: `testuser${Math.floor(Math.random() * 90000 + 10000)}@gmail.com`,
-        password: `sdfkdssjf238432`,
+        password: `sdfkdss@jf238432`,
         unknown: "sdfkdfdsfd",
       };
 

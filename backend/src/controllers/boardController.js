@@ -7,6 +7,7 @@ import { handleValidationErrors } from "../utils/helperMethods.js";
 import { createSuccessResponse } from "../models/responseMapper.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
 import User from "../models/User.js";
+import Task from "../models/Task.js";
 
 /**
  * Controller to create a new task board.
@@ -31,7 +32,7 @@ export const createBoardController = asyncHandler(async (req, res) => {
     });
 
     const user = await User.findById(res.locals.userId);
-    user.boardIds.push(board._id);
+    user.boards.push(board._id);
 
     await user.save();
 
@@ -139,21 +140,21 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
 
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findByIdAndUpdate(res.locals.userId, {
+      $pull: { boards: req.params.boardId },
+    });
 
     if (!user) {
       throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
 
-    user.boardIds = user.boardIds.filter(
-      (boardId) => boardId.toString() !== req.params.boardId,
-    );
-
-    await user.save();
+    const deleteTasks = await Task.deleteMany({
+      _id: { $in: deletedBoard.tasks },
+    });
 
     return res.send(
       createSuccessResponse(req, res, {
-        message: `Board with ID ${req.params["boardId"]} deleted successfully`,
+        message: `Board with ID ${req.params["boardId"]} deleted successfully with ${deleteTasks.deletedCount} tasks.`,
       }),
     );
   } catch (error) {

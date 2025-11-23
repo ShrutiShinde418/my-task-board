@@ -1,11 +1,13 @@
+import mongoose from "mongoose";
+import { z, ZodError } from "zod";
 import Task from "../models/Task.js";
-import { z } from "zod";
 import { createSuccessResponse } from "../models/responseMapper.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import constants from "../utils/constants.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
+import Board from "../models/Board.js";
 
 /**
  * Controller to create a new task.
@@ -47,13 +49,38 @@ export const createTaskController = asyncHandler(async (req, res) => {
           .enum(["inProgress", "completed", "wontDo", "toDo"])
           .default("toDo"),
         icon: z.string().trim().optional().nullable(),
+        boardId: z
+          .string()
+          .trim()
+          .refine(
+            (val) => {
+              return mongoose.Types.ObjectId.isValid(val);
+            },
+            { error: "ObjectId passed is invalid" },
+          ),
       },
-      { error: constants.UNKNOWN_PARAMETERS }
+      { error: constants.UNKNOWN_PARAMETERS },
     );
 
     const result = await taskSchema.parseAsync(req.body);
 
-    const newTask = await Task.create(result);
+    const doesBoardExist = await Board.findById(result.boardId);
+
+    if (!doesBoardExist) {
+      throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
+    }
+
+    const newTask = await Task.create({
+      name: result.name,
+      description: result.description,
+      status: result.status,
+      icon: result.icon,
+      board: result.boardId,
+    });
+
+    await Board.findByIdAndUpdate(result.boardId, {
+      $push: { tasks: newTask._id },
+    });
 
     return res.send(createSuccessResponse(req, res, { task: newTask }));
   } catch (error) {
@@ -117,7 +144,7 @@ export const updateTaskController = asyncHandler(async (req, res) => {
           .optional(),
         icon: z.string().trim().optional().nullable(),
       },
-      { error: constants.UNKNOWN_PARAMETERS }
+      { error: constants.UNKNOWN_PARAMETERS },
     );
 
     const result = await taskSchema.parseAsync(req.body);
@@ -125,7 +152,7 @@ export const updateTaskController = asyncHandler(async (req, res) => {
     const updatedTask = await Task.findByIdAndUpdate(
       req.params["taskId"],
       result,
-      { new: true }
+      { new: true },
     );
 
     return res.send(createSuccessResponse(req, res, { task: updatedTask }));
@@ -163,10 +190,14 @@ export const deleteTaskController = asyncHandler(async (req, res) => {
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
 
+    await Board.findByIdAndUpdate(deleteTask.board, {
+      $pull: { tasks: req.params["taskId"] },
+    });
+
     return res.send(
       createSuccessResponse(req, res, {
         message: `Task with ID ${req.params["taskId"]} deleted successfully`,
-      })
+      }),
     );
   } catch (error) {
     handleValidationErrors(error, req.transactionId);

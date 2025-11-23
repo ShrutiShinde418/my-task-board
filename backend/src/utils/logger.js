@@ -21,17 +21,15 @@ const setupLogger = (filename, loglevel) => {
     datePattern: "YYYY-MM-DD",
   });
 
-  const logger = winston.createLogger({
+  return winston.createLogger({
     level: loglevel,
     format: winston.format.combine(
       winston.format.colorize(),
       winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS" }),
-      winston.format.printf((info) => `${info.timestamp} ${info.message}`)
+      winston.format.printf((info) => `${info.timestamp} ${info.message}`),
     ),
     transports: [transport],
   });
-
-  return logger;
 };
 
 export default setupLogger;

@@ -17,12 +17,14 @@ const boardSchema = new mongoose.Schema(
   {
     name: String,
     description: String,
-    tasks: {
-      type: [mongoose.Types.ObjectId],
-      ref: "Task",
-    },
+    tasks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Task",
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Board = mongoose.model("Board", boardSchema);

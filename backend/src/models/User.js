@@ -18,10 +18,7 @@ const userSchema = new mongoose.Schema(
   {
     email: String,
     password: String,
-    boardIds: {
-      type: [mongoose.Types.ObjectId],
-      ref: "Board",
-    },
+    boards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Board" }],
     isAccountVerified: {
       type: Boolean,
       default: false,

@@ -20,10 +20,14 @@ const taskSchema = new mongoose.Schema(
     description: String,
     status: String,
     icon: String,
+    board: {
+      type: mongoose.Types.ObjectId,
+      ref: "Board",
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Task = mongoose.model("Task", taskSchema);

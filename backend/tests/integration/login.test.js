@@ -236,7 +236,7 @@ describe("Integration Tests for login controller", () => {
     it("should fail to login user when request contains unknown parameters", async () => {
       const requestBody = {
         email: `testuser${Math.floor(Math.random() * 90000 + 10000)}@gmail.com`,
-        password: `sdfkdssjf238432`,
+        password: `sdfkdssjf@238432`,
         unknown: "fsdklfjsdk",
       };
 
