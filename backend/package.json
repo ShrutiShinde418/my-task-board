@@ -6,10 +6,10 @@
   "scripts": {
     "start:local": "cross-env NODE_ENV=local nodemon src/index.js",
     "start:prod": "cross-env NODE_ENV=prod node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest --maxWorkers=1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Shruti Shinde",
   "license": "ISC",
   "description": "",
   "dependencies": {
@@ -29,6 +29,7 @@
   "devDependencies": {
     "cross-env": "^10.0.0",
     "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
     "vitest": "^4.0.13"
   }
 }

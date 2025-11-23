@@ -7,6 +7,6 @@ router.post("/login", login);
 
 router.post("/signup", signup);
 
-router.post("/remove/user", removeUser);
+router.post("/remove/user/:userId", removeUser);
 
 export default router;

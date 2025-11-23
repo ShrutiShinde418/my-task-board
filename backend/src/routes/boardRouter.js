@@ -5,15 +5,16 @@ import {
   updateBoardController,
   deleteBoardController,
 } from "../controllers/boardController.js";
+import { authMiddleware } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.get("/boards/:boardId", getBoardController);
+router.get("/boards/:boardId", authMiddleware, getBoardController);
 
-router.post("/boards", createBoardController);
+router.post("/boards", authMiddleware, createBoardController);
 
-router.put("/boards/:boardId", updateBoardController);
+router.put("/boards/:boardId", authMiddleware, updateBoardController);
 
-router.delete("/boards/:boardId", deleteBoardController);
+router.delete("/boards/:boardId", authMiddleware, deleteBoardController);
 
 export default router;

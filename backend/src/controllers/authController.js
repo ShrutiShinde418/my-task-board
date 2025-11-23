@@ -130,12 +130,22 @@ export const login = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * Controller to remove a user
+ *
+ * This function removes a user from the database
+ *
+ * @function removeUser
+ * @async
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<object>} Sends a JSON response with the board ID on success
+ *
+ * @throws {Error} If removing the user fails, the error is propagated to the error handler
+ */
 export const removeUser = asyncHandler(async (req, res) => {
   try {
-    const result = await objectIdRequestMapper(
-      req.params.userId,
-      req.transactionId,
-    );
+    await objectIdRequestMapper(req.params.userId, req.transactionId);
 
     const removeUser = await User.findByIdAndDelete(req.params.userId);
 

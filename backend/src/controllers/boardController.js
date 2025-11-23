@@ -6,6 +6,7 @@ import Board from "../models/Board.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
 import { createSuccessResponse } from "../models/responseMapper.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
+import User from "../models/User.js";
 
 /**
  * Controller to create a new task board.
@@ -28,6 +29,11 @@ export const createBoardController = asyncHandler(async (req, res) => {
       name: "My Task Board",
       description: "Tasks to keep organised",
     });
+
+    const user = await User.findById(res.locals.userId);
+    user.boardIds.push(board._id);
+
+    await user.save();
 
     return res.send(createSuccessResponse(req, res, { boardId: board._id }));
   } catch (error) {
@@ -94,7 +100,7 @@ export const updateBoardController = asyncHandler(async (req, res) => {
           .min(5, { error: "Description should have at least 5 characters" })
           .optional(),
       },
-      { error: constants.UNKNOWN_PARAMETERS }
+      { error: constants.UNKNOWN_PARAMETERS },
     );
 
     const result = await boardSchema.parseAsync(req.body);
@@ -102,7 +108,7 @@ export const updateBoardController = asyncHandler(async (req, res) => {
     const updatedBoard = await Board.findByIdAndUpdate(
       req.params.boardId,
       result,
-      { new: true }
+      { new: true },
     );
 
     return res.send(createSuccessResponse(req, res, updatedBoard));
@@ -133,12 +139,22 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
 
+    const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
+    user.boardIds = user.boardIds.filter(
+      (boardId) => boardId.toString() !== req.params.boardId,
+    );
+
+    await user.save();
+
     return res.send(
-      createSuccessResponse(
-        req,
-        res,
-        `Task with ID ${req.params["boardId"]} deleted successfully`
-      )
+      createSuccessResponse(req, res, {
+        message: `Board with ID ${req.params["boardId"]} deleted successfully`,
+      }),
     );
   } catch (error) {
     handleValidationErrors(error, req.transactionId);

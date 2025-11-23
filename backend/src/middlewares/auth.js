@@ -1,9 +1,7 @@
-import jose from "jose";
+import { jwtVerify } from "jose";
 import { createErrorResponse } from "../models/responseMapper.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import Constants from "../utils/constants.js";
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export const authMiddleware = async (req, res, next) => {
   try {
@@ -20,9 +18,13 @@ export const authMiddleware = async (req, res, next) => {
       );
     }
 
-    const payload = await jose.jwtVerify(token, secret, {
-      issuer: process.env.ISSUER,
-    });
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(process.env.JWT_SECRET),
+      {
+        issuer: process.env.ISSUER,
+      },
+    );
 
     res.locals.userId = payload.id;
 

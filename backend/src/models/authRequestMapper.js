@@ -26,7 +26,7 @@ export const authRequestMapper = async (req) => {
       { error: constants.UNKNOWN_PARAMETERS },
     );
 
-    return schema.parseAsync(req.body);
+    return await schema.parseAsync(req.body);
   } catch (e) {
     handleValidationErrors(e, req.transactionId);
   }

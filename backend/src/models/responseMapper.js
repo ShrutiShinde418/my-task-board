@@ -39,7 +39,7 @@ export const createErrorResponse = (req, res, exception, statusCode) => {
 export const createSuccessResponse = (req, res, data) => {
   const response = {
     success: true,
-    data,
+    ...data,
   };
 
   res.status(200);
