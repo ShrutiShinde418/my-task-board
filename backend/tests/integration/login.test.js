@@ -37,6 +37,9 @@ describe("Integration Tests for login controller", () => {
         loginResponse.body.message,
         `User with id ${userId} logged in successfully`,
       );
+      assert.exists(loginResponse.body.boards);
+      assert.isArray(loginResponse.body.boards);
+      assert.isEmpty(loginResponse.body.boards);
       assert.isNotEmpty(loginResponse.headers["set-cookie"]);
       assert.include(loginResponse.headers["set-cookie"][0], "token");
       assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");

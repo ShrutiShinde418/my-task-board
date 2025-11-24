@@ -3,10 +3,7 @@ import { SignJWT } from "jose";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import constants from "../utils/constants.js";
 import User from "../models/User.js";
-import {
-  createErrorResponse,
-  createSuccessResponse,
-} from "../models/responseMapper.js";
+import { createSuccessResponse } from "../models/responseMapper.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import { authRequestMapper } from "../models/authRequestMapper.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
@@ -20,7 +17,7 @@ import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
  * @async
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
- * @returns {Promise<object>} Sends a JSON response with the board ID on success
+ * @returns {Promise<object>} Sends a JSON response with the user ID in the response
  *
  * @throws {Error} If signing up the user fails, the error is propagated to the error handler
  */
@@ -31,14 +28,7 @@ export const signup = asyncHandler(async (req, res) => {
     const existingUser = await User.findOne({ email: result.email });
 
     if (existingUser) {
-      return res.send(
-        createErrorResponse(
-          req,
-          res,
-          new ErrorResponse(constants.USER_ALREADY_EXISTS, 423),
-          400,
-        ),
-      );
+      throw new ErrorResponse(constants.USER_ALREADY_EXISTS, 423);
     }
 
     const hashedPassword = await bcrypt.hash(result.password, 12);
@@ -67,7 +57,7 @@ export const signup = asyncHandler(async (req, res) => {
  * @async
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
- * @returns {Promise<object>} Sends a JSON response with the board ID on success
+ * @returns {Promise<object>} Sends a JSON response with the user's details, like the boards created.
  *
  * @throws {Error} If signing up the user fails, the error is propagated to the error handler
  */
@@ -81,14 +71,7 @@ export const login = asyncHandler(async (req, res) => {
     });
 
     if (!existingUser) {
-      return res.send(
-        createErrorResponse(
-          req,
-          res,
-          new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424),
-          400,
-        ),
-      );
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
 
     const doesPasswordMatch = await bcrypt.compare(
@@ -97,14 +80,7 @@ export const login = asyncHandler(async (req, res) => {
     );
 
     if (!doesPasswordMatch) {
-      return res.send(
-        createErrorResponse(
-          req,
-          res,
-          new ErrorResponse(constants.EMAIL_OR_PASSWORD_IS_INVALID, 425),
-          400,
-        ),
-      );
+      throw new ErrorResponse(constants.EMAIL_OR_PASSWORD_IS_INVALID, 425);
     }
 
     const token = await new SignJWT({
@@ -135,6 +111,41 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Controller to retrieve user details
+ *
+ * This function fetches user details, like the task boards created by the user and the tasks associated with them and returns them
+ *
+ * @function getUserDetails
+ * @async
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<object>} Sends a JSON response with the user's board details on success
+ *
+ * @throws {Error} If signing up the user fails, the error is propagated to the error handler
+ */
+export const getUserDetails = asyncHandler(async (req, res) => {
+  try {
+    const existingUser = await User.findById(res.locals.userId).populate({
+      path: "boards",
+      populate: { path: "tasks" },
+    });
+
+    if (!existingUser) {
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
+    return res.send(
+      createSuccessResponse(req, res, {
+        message: `User Details with id ${existingUser._id} logged in successfully`,
+        boards: existingUser.boards,
+      }),
+    );
+  } catch (error) {
+    throw error;
+  }
+});
+
+/**
  * Controller to remove a user
  *
  * This function removes a user from the database
@@ -143,7 +154,7 @@ export const login = asyncHandler(async (req, res) => {
  * @async
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
- * @returns {Promise<object>} Sends a JSON response with the board ID on success
+ * @returns {Promise<object>} Sends a JSON response with the message indicating which user was removed
  *
  * @throws {Error} If removing the user fails, the error is propagated to the error handler
  */
@@ -154,14 +165,7 @@ export const removeUser = asyncHandler(async (req, res) => {
     const removeUser = await User.findByIdAndDelete(req.params.userId);
 
     if (!removeUser) {
-      return res.send(
-        createErrorResponse(
-          req,
-          res,
-          new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424),
-          400,
-        ),
-      );
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
 
     return res.send(
