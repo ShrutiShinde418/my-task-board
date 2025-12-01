@@ -22,9 +22,6 @@ import { createErrorResponse } from "../models/responseMapper.js";
  * @returns {import("express").Response} JSON error response formatted by `createErrorResponse`.
  */
 const errorHandler = (err, req, res, next) => {
-  let error = { ...err };
-
-  error.message = err.message;
   if (err instanceof SyntaxError && "body" in err) {
     req.transactionID = uuidv4();
     req.txnStart = Date.now();
@@ -34,13 +31,13 @@ const errorHandler = (err, req, res, next) => {
         req,
         res,
         new ErrorResponse(Constants.INVALID_JSON, 422),
-        400
-      )
+        400,
+      ),
     );
   }
 
-  if (err instanceof ErrorResponse) {
-    return res.send(createErrorResponse(req, res, error, 400));
+  if (err.name === "ErrorResponse") {
+    return res.send(createErrorResponse(req, res, err, 400));
   }
 
   if (err instanceof Error) {
@@ -49,8 +46,8 @@ const errorHandler = (err, req, res, next) => {
         req,
         res,
         new ErrorResponse(Constants.INTERNAL_COMMUNICATION_EXCEPTION, 500),
-        500
-      )
+        500,
+      ),
     );
   }
 };

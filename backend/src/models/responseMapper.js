@@ -13,6 +13,8 @@
  * @returns {{ success: boolean, error: any }} Standardized error response object.
  */
 export const createErrorResponse = (req, res, exception, statusCode) => {
+  if (exception.name === "ErrorResponse") delete exception.name;
+
   const data = {
     success: false,
     error: exception,

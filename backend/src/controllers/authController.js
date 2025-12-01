@@ -7,6 +7,8 @@ import { createSuccessResponse } from "../models/responseMapper.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import { authRequestMapper } from "../models/authRequestMapper.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
+import Task from "../models/Task.js";
+import Board from "../models/Board.js";
 
 /**
  * Controller to sign up a user
@@ -162,15 +164,33 @@ export const removeUser = asyncHandler(async (req, res) => {
   try {
     await objectIdRequestMapper(req.params.userId, req.transactionId);
 
-    const removeUser = await User.findByIdAndDelete(req.params.userId);
+    const removeUser = await User.findByIdAndDelete(req.params.userId).populate(
+      {
+        path: "boards",
+        populate: { path: "tasks" },
+      },
+    );
 
     if (!removeUser) {
       throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
 
+    const boardIds = removeUser.boards.map((board) => board._id);
+    const taskIds = removeUser.boards.map((board) =>
+      board.tasks.map((task) => task._id),
+    );
+
+    const deletedTasks = await Task.deleteMany({
+      _id: { $in: boardIds },
+    });
+
+    const deletedBoards = await Board.deleteMany({
+      _id: { $in: taskIds },
+    });
+
     return res.send(
       createSuccessResponse(req, res, {
-        message: `User with id ${removeUser._id} removed successfully`,
+        message: `User with id ${removeUser._id} removed successfully with ${deletedBoards.count ?? 0} boards deleted and ${deletedTasks.count ?? 0} tasks deleted`,
       }),
     );
   } catch (error) {

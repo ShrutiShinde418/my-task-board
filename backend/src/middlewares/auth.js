@@ -30,6 +30,17 @@ export const authMiddleware = async (req, res, next) => {
 
     next();
   } catch (e) {
+    if (e.code === "ERR_JWT_EXPIRED") {
+      return res.send(
+        createErrorResponse(
+          req,
+          res,
+          new ErrorResponse(Constants.TOKEN_EXPIRED, 401),
+          401,
+        ),
+      );
+    }
+
     return res.send(
       createErrorResponse(req, res, new ErrorResponse(e.message, 500), 500),
     );

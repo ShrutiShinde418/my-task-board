@@ -16,7 +16,9 @@ class ErrorResponse extends Error {
     super();
     this.code = code;
     this.message = message;
+    this.name = this.constructor.name;
 
+    Object.setPrototypeOf(this, new.target.prototype);
     Error.captureStackTrace(this);
   }
 }

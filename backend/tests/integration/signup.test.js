@@ -2,43 +2,6 @@ import request from "supertest";
 import app from "../../src/index.js";
 
 describe("Integration Tests for signup controller", () => {
-  describe("Positive testcases for signup controller", () => {
-    it("should be able to signup with a valid email and password", async () => {
-      const requestBody = {
-        email: `testuser${Math.floor(Math.random() * 90000 + 10000)}@gmail.com`,
-        password: `sdfkd@svff${Math.floor(Math.random() * 90000 + 10000)}`,
-      };
-
-      const response = await request(app)
-        .post("/api/signup")
-        .set("Content-Type", "application/json")
-        .send(requestBody);
-
-      assert.equal(response.status, 200);
-      assert.isNotEmpty(response.body);
-      assert.equal(response.body.success, true);
-      assert.match(
-        response.body.message,
-        /User successfully created with ObjectID/,
-      );
-
-      const arr = response.body.message.split(" ");
-      const userId = arr[arr.length - 1];
-
-      const removeUserResponse = await request(app)
-        .post(`/api/remove/user/${userId}`)
-        .set("Content-Type", "application/json");
-
-      assert.equal(removeUserResponse.status, 200);
-      assert.isNotEmpty(removeUserResponse.body);
-      assert.equal(removeUserResponse.body.success, true);
-      assert.equal(
-        removeUserResponse.body.message,
-        `User with id ${userId} removed successfully`,
-      );
-    });
-  });
-
   describe("Negative testcases for signup controller", () => {
     it("should be able to signup user when request body contains invalid JSON", async () => {
       const requestBody = {
@@ -171,7 +134,7 @@ describe("Integration Tests for signup controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully`,
+        `User with id ${userId} removed successfully with 0 boards deleted and 0 tasks deleted`,
       );
     });
 
@@ -283,6 +246,43 @@ describe("Integration Tests for signup controller", () => {
       assert.equal(
         response.body.error.message,
         "The request includes unsupported or unrecognized parameter(s).",
+      );
+    });
+  });
+
+  describe("Positive testcases for signup controller", () => {
+    it("should be able to signup with a valid email and password", async () => {
+      const requestBody = {
+        email: `testuser${Math.floor(Math.random() * 90000 + 10000)}@gmail.com`,
+        password: `sdfkd@svff${Math.floor(Math.random() * 90000 + 10000)}`,
+      };
+
+      const response = await request(app)
+        .post("/api/signup")
+        .set("Content-Type", "application/json")
+        .send(requestBody);
+
+      assert.equal(response.status, 200);
+      assert.isNotEmpty(response.body);
+      assert.equal(response.body.success, true);
+      assert.match(
+        response.body.message,
+        /User successfully created with ObjectID/,
+      );
+
+      const arr = response.body.message.split(" ");
+      const userId = arr[arr.length - 1];
+
+      const removeUserResponse = await request(app)
+        .post(`/api/remove/user/${userId}`)
+        .set("Content-Type", "application/json");
+
+      assert.equal(removeUserResponse.status, 200);
+      assert.isNotEmpty(removeUserResponse.body);
+      assert.equal(removeUserResponse.body.success, true);
+      assert.equal(
+        removeUserResponse.body.message,
+        `User with id ${userId} removed successfully with 0 boards deleted and 0 tasks deleted`,
       );
     });
   });

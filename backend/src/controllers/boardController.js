@@ -32,6 +32,11 @@ export const createBoardController = asyncHandler(async (req, res) => {
     });
 
     const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
     user.boards.push(board._id);
 
     await user.save();
@@ -62,7 +67,11 @@ export const getBoardController = asyncHandler(async (req, res) => {
 
     const board = await Board.findById(req.params.boardId);
 
-    return res.send(createSuccessResponse(req, res, board));
+    if (!board) {
+      throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
+    }
+
+    return res.send(createSuccessResponse(req, res, board._doc));
   } catch (error) {
     throw error;
   }
