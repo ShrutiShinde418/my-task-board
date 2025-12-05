@@ -1,5 +1,5 @@
 import { ZodError } from "zod";
-import ErrorResponse from "./ErrorResponse.js";
+import ErrorResponse from "./errorResponse.js";
 import constants from "./constants.js";
 
 /**
@@ -13,11 +13,13 @@ import constants from "./constants.js";
  *
  * @function handleValidationErrors
  * @param {Error|import("zod").ZodError|ErrorResponse} error - The error thrown during validation or execution.
- * @param {string} transactionId - Unique transaction identifier for tracking/logging.
+ * @param {string} transactionID - Unique transaction identifier for tracking/logging.
  *
  * @throws {ErrorResponse} Normalized error response depending on error type.
  */
-export const handleValidationErrors = (error, transactionId) => {
+export const handleValidationErrors = (error, transactionID) => {
+  logger.error(`${transactionID} Inside handleValidationErrors method`);
+
   if (error instanceof ErrorResponse) {
     throw error;
   }
@@ -27,6 +29,8 @@ export const handleValidationErrors = (error, transactionId) => {
     for (let err of error.issues) {
       messages.push(err.message);
     }
+    logger.error(`${transactionID} Error messages :: ${messages}`);
+
     throw new ErrorResponse(messages.join(", "), 422);
   } else {
     throw new ErrorResponse(constants.INTERNAL_COMMUNICATION_EXCEPTION, 500);

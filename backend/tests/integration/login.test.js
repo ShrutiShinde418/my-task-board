@@ -278,7 +278,7 @@ describe("Integration Tests for login controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 boards deleted and 0 tasks deleted`,
+        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
       );
     });
   });
@@ -335,7 +335,7 @@ describe("Integration Tests for login controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 boards deleted and 0 tasks deleted`,
+        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
       );
     });
   });

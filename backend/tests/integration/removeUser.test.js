@@ -14,6 +14,7 @@ describe("Integration testcases for removeUser controller", () => {
       assert.isNotEmpty(response.body.error);
       assert.equal(response.body.error.code, 422);
       assert.equal(response.body.error.message, "ObjectId passed is invalid");
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to remove a user that doesn't exists", async () => {
@@ -27,6 +28,7 @@ describe("Integration testcases for removeUser controller", () => {
       assert.isNotEmpty(response.body.error);
       assert.equal(response.body.error.code, 424);
       assert.equal(response.body.error.message, "User doesn't exist");
+      assert.notExists(response.body.error.name);
     });
   });
 });

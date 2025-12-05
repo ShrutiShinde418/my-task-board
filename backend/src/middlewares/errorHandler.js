@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import ErrorResponse from "../utils/ErrorResponse.js";
+import ErrorResponse from "../utils/errorResponse.js";
 import Constants from "../utils/constants.js";
 import { createErrorResponse } from "../models/responseMapper.js";
 
@@ -26,6 +26,10 @@ const errorHandler = (err, req, res, next) => {
     req.transactionID = uuidv4();
     req.txnStart = Date.now();
 
+    logger.error(
+      `${req.transactionID} Request body contains invalid JSON, so throwing an error`,
+    );
+
     return res.send(
       createErrorResponse(
         req,
@@ -41,6 +45,10 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (err instanceof Error) {
+    logger.error(
+      `${req.transactionID} Internal Communication Error occurred :: ${err}, ${JSON.stringify(err)}`,
+    );
+
     return res.send(
       createErrorResponse(
         req,

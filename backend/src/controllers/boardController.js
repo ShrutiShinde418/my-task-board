@@ -1,6 +1,6 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { z } from "zod";
-import ErrorResponse from "../utils/ErrorResponse.js";
+import ErrorResponse from "../utils/errorResponse.js";
 import constants from "../utils/constants.js";
 import Board from "../models/Board.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
@@ -26,20 +26,36 @@ import Task from "../models/Task.js";
  */
 export const createBoardController = asyncHandler(async (req, res) => {
   try {
+    logger.debug(
+      `${req.transactionID} Inside createBoardController controller`,
+    );
+
+    const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      logger.error(
+        `${req.transactionID} User does not exist, so throwing error`,
+      );
+
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
     const board = await Board.create({
       name: "My Task Board",
       description: "Tasks to keep organised",
     });
 
-    const user = await User.findById(res.locals.userId);
-
-    if (!user) {
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
-    }
+    logger.debug(
+      `${req.transactionID} Adding boardID ${board._id} to the userID's ${user._id} boards array`,
+    );
 
     user.boards.push(board._id);
 
     await user.save();
+
+    logger.debug(
+      `${req.transactionID} Successfully added boardID ${board._id} to user's ${res.locals.userId} board array`,
+    );
 
     return res.send(createSuccessResponse(req, res, { boardId: board._id }));
   } catch (error) {
@@ -63,13 +79,27 @@ export const createBoardController = asyncHandler(async (req, res) => {
  */
 export const getBoardController = asyncHandler(async (req, res) => {
   try {
-    await objectIdRequestMapper(req.params.boardId, req.transactionId);
+    logger.debug(`${req.transactionID} Inside getBoardController controller`);
+
+    await objectIdRequestMapper(req.params.boardId, req.transactionID);
+
+    logger.debug(
+      `${req.transactionID} Fetching board details for board with ID ${req.params.boardId}`,
+    );
 
     const board = await Board.findById(req.params.boardId);
 
     if (!board) {
+      logger.error(
+        `${req.transactionID} The board with ID ${req.params.boardId} does not exist, so throwing error`,
+      );
+
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
+
+    logger.debug(
+      `${req.transactionID} Successfully fetched board details, returning the same`,
+    );
 
     return res.send(createSuccessResponse(req, res, board._doc));
   } catch (error) {
@@ -79,6 +109,9 @@ export const getBoardController = asyncHandler(async (req, res) => {
 
 /**
  * Controller to update a board by its ID.
+ *
+ * Updates a board document from the database using the `boardId` provided
+ * in the request parameters. Returns the updated board data in a standardized success response.
  *
  * @async
  * @function updateBoardController
@@ -91,13 +124,28 @@ export const getBoardController = asyncHandler(async (req, res) => {
  */
 export const updateBoardController = asyncHandler(async (req, res) => {
   try {
-    await objectIdRequestMapper(req.params.boardId, req.transactionId);
+    logger.debug(
+      `${req.transactionID} Inside updateBoardController controller`,
+    );
+
+    await objectIdRequestMapper(req.params.boardId, req.transactionID);
+
+    logger.debug(
+      `${req.transactionID} Fetching board details for board with ID ${req.params.boardId}`,
+    );
 
     const board = await Board.findById(req.params.boardId);
 
     if (!board) {
+      logger.error(
+        `${req.transactionID} The board with ID ${req.params.boardId} does not exist, so throwing error`,
+      );
+
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
+
+    logger.debug(`${req.transactionID} Validating the request body`);
+
     const boardSchema = z.strictObject(
       {
         name: z
@@ -115,20 +163,29 @@ export const updateBoardController = asyncHandler(async (req, res) => {
 
     const result = await boardSchema.parseAsync(req.body);
 
+    logger.debug(`${req.transactionID} Request body validated successfully`);
+
     const updatedBoard = await Board.findByIdAndUpdate(
       req.params.boardId,
       result,
       { new: true },
     );
 
-    return res.send(createSuccessResponse(req, res, updatedBoard));
+    logger.debug(
+      `${req.transactionID} Board with ID ${updatedBoard._id} updated successfully`,
+    );
+
+    return res.send(createSuccessResponse(req, res, updatedBoard._doc));
   } catch (error) {
-    handleValidationErrors(error, req.transactionId);
+    handleValidationErrors(error, req.transactionID);
   }
 });
 
 /**
  * Controller to delete a board by its ID.
+ *
+ * Deletes a board document from the database using the `boardId` provided
+ * in the request parameters. The controller also deletes the tasks associated with the board and return a success message on the number of tasks deleted.
  *
  * @async
  * @function deleteBoardController
@@ -137,36 +194,60 @@ export const updateBoardController = asyncHandler(async (req, res) => {
  * @throws {ErrorResponse} Will throw an error if the board does not exist
  * or if validation fails.
  * @returns {Promise<Object>} A success response confirming
- * the deletion of the board.
+ * the deletion of the board and its associated tasks.
  */
 export const deleteBoardController = asyncHandler(async (req, res) => {
   try {
-    await objectIdRequestMapper(req.params.boardId, req.transactionId);
+    logger.debug(
+      `${req.transactionID} Inside deleteBoardController controller`,
+    );
+
+    await objectIdRequestMapper(req.params.boardId, req.transactionID);
 
     const deletedBoard = await Board.findByIdAndDelete(req.params.boardId);
 
     if (!deletedBoard) {
+      logger.error(
+        `${req.transactionID} The board with ID ${req.params.boardId} does not exist, so throwing error`,
+      );
+
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
+
+    logger.debug(
+      `${req.transactionID} Removing boardID ${deletedBoard._id} from user ID's ${res.locals.userId} boards array`,
+    );
 
     const user = await User.findByIdAndUpdate(res.locals.userId, {
       $pull: { boards: req.params.boardId },
     });
 
     if (!user) {
+      logger.error(
+        `${req.transactionID} User with ID ${res.locals.userId} does not exist, so throwing an error`,
+      );
+
       throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
+
+    logger.debug(
+      `${req.transactionID} Deleting all tasks present in the board with ID ${deletedBoard._id}`,
+    );
 
     const deleteTasks = await Task.deleteMany({
       _id: { $in: deletedBoard.tasks },
     });
 
+    logger.debug(
+      `${req.transactionID} Board with ID ${req.params["boardId"]} deleted successfully with ${deleteTasks.deletedCount ?? 0} task(s)`,
+    );
+
     return res.send(
       createSuccessResponse(req, res, {
-        message: `Board with ID ${req.params["boardId"]} deleted successfully with ${deleteTasks.deletedCount} tasks.`,
+        message: `Board with ID ${req.params["boardId"]} deleted successfully with ${deleteTasks.deletedCount ?? 0} task(s).`,
       }),
     );
   } catch (error) {
-    handleValidationErrors(error, req.transactionId);
+    handleValidationErrors(error, req.transactionID);
   }
 });

@@ -4,6 +4,10 @@ import { handleValidationErrors } from "../utils/helperMethods.js";
 
 export const authRequestMapper = async (req) => {
   try {
+    logger.debug(
+      `${req.transactionID} Validating the request body with email: ${req.body.email}`,
+    );
+
     const schema = z.strictObject(
       {
         email: z
@@ -28,6 +32,10 @@ export const authRequestMapper = async (req) => {
 
     return await schema.parseAsync(req.body);
   } catch (e) {
-    handleValidationErrors(e, req.transactionId);
+    logger.error(
+      `${req.transactionID} Error occurred while validating the request body: ${e}, ${JSON.stringify(e)}`,
+    );
+
+    handleValidationErrors(e, req.transactionID);
   }
 };

@@ -8,14 +8,16 @@ import { handleValidationErrors } from "../utils/helperMethods.js";
  *              If the input is invalid, it delegates error handling to `handleValidationErrors`.
  *
  * @param {string} objectId - The ObjectId string to validate and sanitize.
- * @param {string} transactionId - A unique identifier for tracing the request, used in error handling.
+ * @param {string} transactionID - A unique identifier for tracing the request, used in error handling.
  *
  * @returns {Promise<string>} A trimmed and validated ObjectId string.
  *
  * @throws {ErrorResponse} If the ObjectId is invalid or fails schema validation.
  */
-export const objectIdRequestMapper = async (objectId, transactionId) => {
+export const objectIdRequestMapper = async (objectId, transactionID) => {
   try {
+    logger.debug(`${transactionID} Validating the ObjectID :: ${objectId}`);
+    
     const schema = z
       .string()
       .trim()
@@ -28,6 +30,6 @@ export const objectIdRequestMapper = async (objectId, transactionId) => {
 
     return await schema.parseAsync(objectId);
   } catch (error) {
-    handleValidationErrors(error, transactionId);
+    handleValidationErrors(error, transactionID);
   }
 };

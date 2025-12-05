@@ -15,6 +15,10 @@
 export const createErrorResponse = (req, res, exception, statusCode) => {
   if (exception.name === "ErrorResponse") delete exception.name;
 
+  logger.error(
+    `${req.transactionID} Exception :: ${exception}, ${JSON.stringify(exception)}`,
+  );
+
   const data = {
     success: false,
     error: exception,
@@ -43,6 +47,8 @@ export const createSuccessResponse = (req, res, data) => {
     success: true,
     ...data,
   };
+
+  logger.debug(`${req.transactionID} Response Data :: ${JSON.stringify(data)}`);
 
   res.status(200);
 

@@ -25,11 +25,19 @@ import Board from "../models/Board.js";
  */
 export const signup = asyncHandler(async (req, res) => {
   try {
+    logger.debug(`${req.transactionID} Inside signup controller`);
+
     const result = await authRequestMapper(req);
+
+    logger.debug(`${req.transactionID} Request body validated successfully`);
 
     const existingUser = await User.findOne({ email: result.email });
 
     if (existingUser) {
+      logger.error(
+        `${req.transactionID} User already exists with ID ${existingUser._id}, so throwing error`,
+      );
+
       throw new ErrorResponse(constants.USER_ALREADY_EXISTS, 423);
     }
 
@@ -39,6 +47,10 @@ export const signup = asyncHandler(async (req, res) => {
       email: result.email,
       password: hashedPassword,
     });
+
+    logger.debug(
+      `${req.transactionID} Successfully created new user with email: ${result.email}`,
+    );
 
     return res.send(
       createSuccessResponse(req, res, {
@@ -65,6 +77,8 @@ export const signup = asyncHandler(async (req, res) => {
  */
 export const login = asyncHandler(async (req, res) => {
   try {
+    logger.debug(`${req.transactionID} Inside login controller`);
+
     const result = await authRequestMapper(req);
 
     const existingUser = await User.findOne({ email: result.email }).populate({
@@ -72,7 +86,13 @@ export const login = asyncHandler(async (req, res) => {
       populate: { path: "tasks" },
     });
 
+    logger.debug(`${req.transactionID} Request body validated successfully`);
+
     if (!existingUser) {
+      logger.error(
+        `${req.transactionID} User already exists, so throwing error`,
+      );
+
       throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
 
@@ -82,8 +102,16 @@ export const login = asyncHandler(async (req, res) => {
     );
 
     if (!doesPasswordMatch) {
+      logger.error(
+        `${req.transactionID} Email or password doesn't match, so throwing error`,
+      );
+
       throw new ErrorResponse(constants.EMAIL_OR_PASSWORD_IS_INVALID, 425);
     }
+
+    logger.debug(
+      `${req.transactionID} Create JWT token to be stored as a cookie`,
+    );
 
     const token = await new SignJWT({
       id: existingUser._id.toString(),
@@ -100,6 +128,10 @@ export const login = asyncHandler(async (req, res) => {
       sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
       maxAge: Number(process.env.TOKEN_EXPIRY[0]) * 24 * 60 * 60 * 1000,
     });
+
+    logger.debug(
+      `${req.transactionID} User with id ${existingUser._id} logged in successfully`,
+    );
 
     return res.send(
       createSuccessResponse(req, res, {
@@ -127,14 +159,24 @@ export const login = asyncHandler(async (req, res) => {
  */
 export const getUserDetails = asyncHandler(async (req, res) => {
   try {
+    logger.debug(`${req.transactionID} Inside getUserDetails controller`);
+
     const existingUser = await User.findById(res.locals.userId).populate({
       path: "boards",
       populate: { path: "tasks" },
     });
 
     if (!existingUser) {
+      logger.error(
+        `${req.transactionID} User doesn't exist, so throwing an error`,
+      );
+
       throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
+
+    logger.debug(
+      `${req.transactionID} User with id ${existingUser._id} logged in successfully`,
+    );
 
     return res.send(
       createSuccessResponse(req, res, {
@@ -150,7 +192,7 @@ export const getUserDetails = asyncHandler(async (req, res) => {
 /**
  * Controller to remove a user
  *
- * This function removes a user from the database
+ * This function removes a user from the database, with its associated board and tasks
  *
  * @function removeUser
  * @async
@@ -162,7 +204,13 @@ export const getUserDetails = asyncHandler(async (req, res) => {
  */
 export const removeUser = asyncHandler(async (req, res) => {
   try {
-    await objectIdRequestMapper(req.params.userId, req.transactionId);
+    logger.debug(`${req.transactionID} Inside removeUser controller`);
+
+    await objectIdRequestMapper(req.params.userId, req.transactionID);
+
+    logger.debug(
+      `${req.transactionID} Request body has been successfully validated`,
+    );
 
     const removeUser = await User.findByIdAndDelete(req.params.userId).populate(
       {
@@ -172,25 +220,44 @@ export const removeUser = asyncHandler(async (req, res) => {
     );
 
     if (!removeUser) {
+      logger.error(
+        `${req.transactionID} User with ID ${req.params.userId} not found, throwing an error`,
+      );
+
       throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
 
     const boardIds = removeUser.boards.map((board) => board._id);
-    const taskIds = removeUser.boards.map((board) =>
-      board.tasks.map((task) => task._id),
+    const taskIdsArray = removeUser.boards.reduce((acc, board) => {
+      const ids = board.tasks.map((task) => task._id);
+      acc.push(...ids);
+
+      return acc;
+    }, []);
+
+    logger.debug(
+      `${req.transactionID} Removing tasks :: ${taskIdsArray ?? null} associated with the user`,
     );
 
     const deletedTasks = await Task.deleteMany({
+      _id: { $in: taskIdsArray },
+    });
+
+    logger.debug(
+      `${req.transactionID} Removing boards :: ${boardIds} associated with the user`,
+    );
+
+    const deletedBoards = await Board.deleteMany({
       _id: { $in: boardIds },
     });
 
-    const deletedBoards = await Board.deleteMany({
-      _id: { $in: taskIds },
-    });
+    logger.debug(
+      `${req.transactionID} User with id ${removeUser._id} removed successfully with ${deletedBoards.deletedCount ?? 0} board(s) deleted and ${deletedTasks.deletedCount ?? 0} task(s) deleted`,
+    );
 
     return res.send(
       createSuccessResponse(req, res, {
-        message: `User with id ${removeUser._id} removed successfully with ${deletedBoards.count ?? 0} boards deleted and ${deletedTasks.count ?? 0} tasks deleted`,
+        message: `User with id ${removeUser._id} removed successfully with ${deletedBoards.deletedCount ?? 0} board(s) deleted and ${deletedTasks.deletedCount ?? 0} task(s) deleted`,
       }),
     );
   } catch (error) {

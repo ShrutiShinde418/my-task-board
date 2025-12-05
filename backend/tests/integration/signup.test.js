@@ -23,6 +23,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Request Body contains invalid JSON",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when request body contains an invalid email - Case 1", async () => {
@@ -45,6 +46,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Please enter a valid email address.",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when request body contains an invalid email - Case 2", async () => {
@@ -67,6 +69,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Please enter a valid email address.",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when request body contains an invalid email - Case 3", async () => {
@@ -89,6 +92,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Please enter a valid email address.",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when user already exists", async () => {
@@ -121,6 +125,7 @@ describe("Integration Tests for signup controller", () => {
       assert.isNotEmpty(signUpResponse.body.error);
       assert.equal(signUpResponse.body.error.code, 423);
       assert.equal(signUpResponse.body.error.message, "User already exists");
+      assert.notExists(response.body.error?.name);
 
       const arr = response.body.message.split(" ");
       const userId = arr[arr.length - 1];
@@ -134,7 +139,7 @@ describe("Integration Tests for signup controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 boards deleted and 0 tasks deleted`,
+        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
       );
     });
 
@@ -158,6 +163,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Password should have minimum eight characters, at least one letter, one number and one special character",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when password contains only letters", async () => {
@@ -180,6 +186,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Password should have minimum eight characters, at least one letter, one number and one special character",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when password contains only numbers", async () => {
@@ -202,6 +209,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Password should have minimum eight characters, at least one letter, one number and one special character",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when password does not have any special characters", async () => {
@@ -224,6 +232,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "Password should have minimum eight characters, at least one letter, one number and one special character",
       );
+      assert.notExists(response.body.error.name);
     });
 
     it("should fail to signup user when request has unknown parameters", async () => {
@@ -247,6 +256,7 @@ describe("Integration Tests for signup controller", () => {
         response.body.error.message,
         "The request includes unsupported or unrecognized parameter(s).",
       );
+      assert.notExists(response.body.error.name);
     });
   });
 
@@ -282,7 +292,7 @@ describe("Integration Tests for signup controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 boards deleted and 0 tasks deleted`,
+        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
       );
     });
   });

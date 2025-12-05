@@ -6,15 +6,21 @@ import {
   getUserDetails,
 } from "../controllers/authController.js";
 import { authMiddleware } from "../middlewares/auth.js";
+import startTransaction from "../middlewares/startTransaction.js";
 
 const router = express.Router();
 
-router.post("/login", login);
+router.post("/login", startTransaction, login);
 
-router.post("/signup", signup);
+router.post("/signup", startTransaction, signup);
 
-router.get("/get/user/details", authMiddleware, getUserDetails);
+router.get(
+  "/get/user/details",
+  startTransaction,
+  authMiddleware,
+  getUserDetails,
+);
 
-router.post("/remove/user/:userId", removeUser);
+router.post("/remove/user/:userId", startTransaction, removeUser);
 
 export default router;

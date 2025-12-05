@@ -11,6 +11,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import boardRouter from "./routes/boardRouter.js";
 import taskRouter from "./routes/taskRouter.js";
 import authRouter from "./routes/authRouter.js";
+import setupLogger from "./utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,6 +21,11 @@ const serverTimeout = process.env.TIMEOUT;
 dotenv.config({
   path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}`),
 });
+
+global.logger = setupLogger(
+  process.env.LOGGER_FILE_PATH,
+  process.env.LOGGER_LEVEL,
+);
 
 const app = express();
 app.use(express.json());
