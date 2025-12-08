@@ -147,6 +147,46 @@ describe("Integration testcases for board controller", function () {
         assert.equal(response.body.error.message, "ObjectId passed is invalid");
       });
 
+      it("should fail to fetch a board when the token passed is expired", async () => {
+        const response = await request(app)
+          .get("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
+          .set("Content-Type", "application/json")
+          .set(
+            "Cookie",
+            `token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY5MjZmZDdiOTZjNzc3NjQwYTc3Y2JlYSIsImlhdCI6MTc2NDE2Mjk3NCwiZXhwIjoxNzY0MzM1Nzc0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUxNzMifQ.Ec2YGBFTiTxtaE6r_QI7ZGO8yh-4mWUAT6jDexEqKeI`,
+          );
+
+        assert.equal(response.status, 401);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 401);
+        assert.equal(
+          response.body.error.message,
+          "The authentication token has expired",
+        );
+      });
+
+      it("should fail to fetch a board when the token passed is of a user that doesn't exist", async () => {
+        const newUser = await helper.createUser();
+
+        await helper.removeUser(newUser.userId);
+
+        const response = await request(app)
+          .get("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${newUser.token}`);
+
+        assert.equal(response.status, 400);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, false);
+        assert.isNotEmpty(response.body.error);
+        assert.equal(response.body.error.code, 424);
+        assert.equal(response.body.error.message, "User doesn't exist");
+        assert.notExists(response.body.error.name);
+      });
+
       afterAll(async () => {
         await helper.removeUser(result.userId);
       });
@@ -278,10 +318,15 @@ describe("Integration testcases for board controller", function () {
       });
 
       it("should fail to update a board that doesn't exist", async () => {
+        const requestBody = {
+          name: "My New Task Board",
+        };
+
         const response = await request(app)
           .put("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`);
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
 
         assert.equal(response.status, 400);
         assert.isNotEmpty(response.body);
@@ -293,6 +338,49 @@ describe("Integration testcases for board controller", function () {
           response.body.error.message,
           "The requested resource could not be located",
         );
+      });
+
+      it("should fail to update a board when the token passed is expired", async () => {
+        const response = await request(app)
+          .put("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
+          .set("Content-Type", "application/json")
+          .set(
+            "Cookie",
+            `token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY5MjZmZDdiOTZjNzc3NjQwYTc3Y2JlYSIsImlhdCI6MTc2NDE2Mjk3NCwiZXhwIjoxNzY0MzM1Nzc0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUxNzMifQ.Ec2YGBFTiTxtaE6r_QI7ZGO8yh-4mWUAT6jDexEqKeI`,
+          );
+
+        assert.equal(response.status, 401);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 401);
+        assert.equal(
+          response.body.error.message,
+          "The authentication token has expired",
+        );
+      });
+
+      it("should fail to update a board when the token passed is of a user that doesn't exist", async () => {
+        const newUser = await helper.createUserWithBoard();
+
+        const requestBody = {
+          name: "My New Task Board",
+        };
+
+        const response = await request(app)
+          .put(`/api/boards/${newUser.boardId}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${newUser.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 400);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 424);
+        assert.equal(response.body.error.message, "User doesn't exist");
       });
 
       it("should fail to update a board when the boardId passed is not a valid ObjectID", async () => {
@@ -430,6 +518,27 @@ describe("Integration testcases for board controller", function () {
         assert.equal(
           response.body.error.message,
           "The requested resource could not be located",
+        );
+      });
+
+      it("should fail to remove a board when the token passed is expired", async () => {
+        const response = await request(app)
+          .delete("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
+          .set("Content-Type", "application/json")
+          .set(
+            "Cookie",
+            `token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY5MjZmZDdiOTZjNzc3NjQwYTc3Y2JlYSIsImlhdCI6MTc2NDE2Mjk3NCwiZXhwIjoxNzY0MzM1Nzc0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUxNzMifQ.Ec2YGBFTiTxtaE6r_QI7ZGO8yh-4mWUAT6jDexEqKeI`,
+          );
+
+        assert.equal(response.status, 401);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 401);
+        assert.equal(
+          response.body.error.message,
+          "The authentication token has expired",
         );
       });
 

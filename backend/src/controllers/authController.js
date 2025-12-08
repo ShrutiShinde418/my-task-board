@@ -27,6 +27,8 @@ export const signup = asyncHandler(async (req, res) => {
   try {
     logger.debug(`${req.transactionID} Inside signup controller`);
 
+    logger.debug(`${req.transactionID} Validating the request body`);
+
     const result = await authRequestMapper(req);
 
     logger.debug(`${req.transactionID} Request body validated successfully`);
@@ -78,6 +80,8 @@ export const signup = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   try {
     logger.debug(`${req.transactionID} Inside login controller`);
+
+    logger.debug(`${req.transactionID} Validating the request body`);
 
     const result = await authRequestMapper(req);
 
@@ -175,7 +179,7 @@ export const getUserDetails = asyncHandler(async (req, res) => {
     }
 
     logger.debug(
-      `${req.transactionID} User with id ${existingUser._id} logged in successfully`,
+      `${req.transactionID} Fetched user details with id ${existingUser._id} successfully`,
     );
 
     return res.send(
@@ -205,6 +209,10 @@ export const getUserDetails = asyncHandler(async (req, res) => {
 export const removeUser = asyncHandler(async (req, res) => {
   try {
     logger.debug(`${req.transactionID} Inside removeUser controller`);
+
+    logger.debug(
+      `${req.transactionID} Validating the ObjectID passed as params`,
+    );
 
     await objectIdRequestMapper(req.params.userId, req.transactionID);
 
@@ -236,7 +244,7 @@ export const removeUser = asyncHandler(async (req, res) => {
     }, []);
 
     logger.debug(
-      `${req.transactionID} Removing tasks :: ${taskIdsArray ?? null} associated with the user`,
+      `${req.transactionID} Removing tasks :: ${taskIdsArray ?? "None present"} associated with the user`,
     );
 
     const deletedTasks = await Task.deleteMany({
@@ -244,7 +252,7 @@ export const removeUser = asyncHandler(async (req, res) => {
     });
 
     logger.debug(
-      `${req.transactionID} Removing boards :: ${boardIds} associated with the user`,
+      `${req.transactionID} Removing boards :: ${boardIds ?? "None present"} associated with the user`,
     );
 
     const deletedBoards = await Board.deleteMany({

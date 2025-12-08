@@ -20,7 +20,7 @@ import constants from "./constants.js";
 export const handleValidationErrors = (error, transactionID) => {
   logger.error(`${transactionID} Inside handleValidationErrors method`);
 
-  if (error instanceof ErrorResponse) {
+  if (error.name === "ErrorResponse") {
     throw error;
   }
 

@@ -1,10 +1,22 @@
+import { useState } from "react";
 import close from "../assets/close_ring_duotone-1.svg";
 import deleteIcon from "../assets/Trash.svg";
 import saveIcon from "../assets/Done_round_duotone.svg";
 import { useTaskSlice } from "../hooks/useTaskSlice.js";
+import IconChip from "./IconChip.jsx";
+import { iconData } from "../utils/helpers.js";
 
 const NewTaskOffCanvas = () => {
-  const { closeOffCanvasHandler } = useTaskSlice();
+  const { closeOffCanvasHandler, addNewTaskHandler } = useTaskSlice();
+
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    addNewTaskHandler();
+  };
+
   return (
     <div className="p-6 flex flex-col font-custom">
       <div className="flex justify-between items-center mb-5">
@@ -17,7 +29,7 @@ const NewTaskOffCanvas = () => {
           <img src={close} alt="Close" />
         </button>
       </div>
-      <form className="flex flex-col gap-5">
+      <form className="flex flex-col gap-5" onSubmit={submitHandler}>
         <div className="flex flex-col gap-1">
           <label htmlFor="taskName" className="text-gray text-sm">
             Task name
@@ -28,6 +40,7 @@ const NewTaskOffCanvas = () => {
             name="taskName"
             placeholder="Enter your task name"
             className="py-2 px-4 border border-gray rounded-md"
+            onChange={(e) => setTaskTitle(e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -41,13 +54,30 @@ const NewTaskOffCanvas = () => {
             rows="10"
             placeholder="Enter a short description"
             className="py-2 px-4 border border-gray rounded-md"
+            onChange={(e) => setTaskDescription(e.target.value)}
           ></textarea>
         </div>
         <div>
-          <label className="text-gray text-sm">Icon</label>
+          <p className="text-gray text-sm">Icon</p>
+          <div className="flex gap-3">
+            {iconData.map((icon) => (
+              <IconChip id={icon.id} key={icon.id} labelContent={icon.emoji} />
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-gray text-sm">Status</p>
+          <div className="flex gap-3">
+            {iconData.map((icon) => (
+              <IconChip id={icon.id} key={icon.id} labelContent={icon.emoji} />
+            ))}
+          </div>
         </div>
         <div className="flex gap-3 items-center text-sm self-end">
-          <button className="flex gap-1 bg-gray text-white px-6 py-2 rounded-3xl">
+          <button
+            className="flex gap-1 bg-gray text-white px-6 py-2 rounded-3xl"
+            onClick={closeOffCanvasHandler}
+          >
             Delete
             <img src={deleteIcon} alt="Delete" />
           </button>

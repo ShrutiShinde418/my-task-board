@@ -10,6 +10,7 @@ export const taskHeaders = [
     icon: taskProgressIcon,
     bgColor: "bg-yellow",
     iconBgColor: "bg-orange",
+    prop: "inProgress",
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ export const taskHeaders = [
     icon: taskDoneIcon,
     bgColor: "bg-limeGreen",
     iconBgColor: "bg-green",
+    prop: "completed",
   },
   {
     id: 3,
@@ -26,6 +28,7 @@ export const taskHeaders = [
     icon: wontDoTaskIcon,
     bgColor: "bg-babyPink",
     iconBgColor: "bg-red",
+    prop: "wontDo",
   },
   {
     id: 4,
@@ -33,5 +36,33 @@ export const taskHeaders = [
     emoji: "📚",
     icon: null,
     bgColor: "bg-veryLightGray",
+    prop: "toDo",
+  },
+];
+
+export const iconData = [
+  {
+    id: 1,
+    emoji: "👩‍💻",
+  },
+  {
+    id: 2,
+    emoji: "💬",
+  },
+  {
+    id: 3,
+    emoji: "🍵",
+  },
+  {
+    id: 4,
+    emoji: "🏋️",
+  },
+  {
+    id: 5,
+    emoji: "📚",
+  },
+  {
+    id: 6,
+    emoji: "⏰",
   },
 ];

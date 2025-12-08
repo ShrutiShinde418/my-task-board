@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 import { z, ZodError } from "zod";
 import Task from "../models/Task.js";
-import { createSuccessResponse } from "../models/responseMapper.js";
-import ErrorResponse from "../utils/ErrorResponse.js";
+import Board from "../models/Board.js";
+import User from "../models/User.js";
 import constants from "../utils/constants.js";
+import ErrorResponse from "../utils/ErrorResponse.js";
+import { createSuccessResponse } from "../models/responseMapper.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
-import Board from "../models/Board.js";
 
 /**
  * Controller to create a new task.
@@ -34,6 +35,24 @@ import Board from "../models/Board.js";
  */
 export const createTaskController = asyncHandler(async (req, res) => {
   try {
+    logger.debug(`${req.transactionID} Inside createTaskController`);
+
+    logger.debug(
+      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+    );
+
+    const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      logger.error(
+        `${req.transactionID} User does not exist, so throwing error`,
+      );
+
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
+    logger.debug(`${req.transactionID} Validating the request body`);
+
     const taskSchema = z.strictObject(
       {
         name: z
@@ -64,9 +83,19 @@ export const createTaskController = asyncHandler(async (req, res) => {
 
     const result = await taskSchema.parseAsync(req.body);
 
+    logger.debug(`${req.transactionID} Request body validated successfully`);
+
+    logger.debug(
+      `${req.transactionID} Checking if the boardId ${result.boardId} exists in the database`,
+    );
+
     const doesBoardExist = await Board.findById(result.boardId);
 
     if (!doesBoardExist) {
+      logger.error(
+        `${req.transactionID} The boardId ${result.boardId} does not exists in the database, throwing error`,
+      );
+
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
 
@@ -78,9 +107,17 @@ export const createTaskController = asyncHandler(async (req, res) => {
       board: result.boardId,
     });
 
+    logger.debug(
+      `${req.transactionID} Successfully created a new task, and appending it to the tasks array in the board`,
+    );
+
     await Board.findByIdAndUpdate(result.boardId, {
       $push: { tasks: newTask._id },
     });
+
+    logger.debug(
+      `${req.transactionID} Successfully pushed the taskID in the tasks array in the board, returning the new tasks created`,
+    );
 
     return res.send(createSuccessResponse(req, res, { task: newTask }));
   } catch (error) {
@@ -117,13 +154,30 @@ export const createTaskController = asyncHandler(async (req, res) => {
  */
 export const updateTaskController = asyncHandler(async (req, res) => {
   try {
+    logger.debug(`${req.transactionID} Inside updateTaskController`);
+
+    logger.debug(
+      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+    );
+
+    const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      logger.error(
+        `${req.transactionID} User does not exist, so throwing error`,
+      );
+
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
+    logger.debug(
+      `${req.transactionID} Validating the ObjectID passed as params`,
+    );
+
     await objectIdRequestMapper(req.params["taskId"], req.transactionID);
 
-    const task = await Task.findById(req.params["taskId"]);
+    logger.debug(`${req.transactionID} Validating the request body`);
 
-    if (!task) {
-      throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
-    }
     const taskSchema = z.strictObject(
       {
         name: z
@@ -149,11 +203,19 @@ export const updateTaskController = asyncHandler(async (req, res) => {
 
     const result = await taskSchema.parseAsync(req.body);
 
+    logger.debug(
+      `${req.transactionID} Request body validated successfully and updating the task`,
+    );
+
     const updatedTask = await Task.findByIdAndUpdate(
       req.params["taskId"],
       result,
       { new: true },
     );
+
+    if (!updatedTask) {
+      throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
+    }
 
     return res.send(createSuccessResponse(req, res, { task: updatedTask }));
   } catch (error) {
@@ -182,17 +244,51 @@ export const updateTaskController = asyncHandler(async (req, res) => {
  */
 export const deleteTaskController = asyncHandler(async (req, res) => {
   try {
+    logger.debug(
+      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+    );
+
+    const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      logger.error(
+        `${req.transactionID} User does not exist, so throwing error`,
+      );
+
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
+    logger.debug(
+      `${req.transactionID} Validating the ObjectID passed as params`,
+    );
+
     await objectIdRequestMapper(req.params["taskId"], req.transactionID);
+
+    logger.debug(
+      `${req.transactionID} Deleting the task with ID ${req.params["taskId"]}`,
+    );
 
     const deleteTask = await Task.findByIdAndDelete(req.params["taskId"]);
 
     if (!deleteTask) {
+      logger.error(
+        `${req.transactionID} The task does not exist, so throwing error`,
+      );
+
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
+
+    logger.debug(
+      `${req.transactionID} Removing the taskID from the tasks array from the board`,
+    );
 
     await Board.findByIdAndUpdate(deleteTask.board, {
       $pull: { tasks: req.params["taskId"] },
     });
+
+    logger.debug(
+      `${req.transactionID} Successfully deleted the task with ID ${req.params["taskId"]} and removed it from the board ${deleteTask.board}`,
+    );
 
     return res.send(
       createSuccessResponse(req, res, {

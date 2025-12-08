@@ -30,6 +30,10 @@ export const createBoardController = asyncHandler(async (req, res) => {
       `${req.transactionID} Inside createBoardController controller`,
     );
 
+    logger.debug(
+      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+    );
+
     const user = await User.findById(res.locals.userId);
 
     if (!user) {
@@ -39,6 +43,8 @@ export const createBoardController = asyncHandler(async (req, res) => {
 
       throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
+
+    logger.debug(`${req.transactionID} Creating a new board`);
 
     const board = await Board.create({
       name: "My Task Board",
@@ -80,6 +86,24 @@ export const createBoardController = asyncHandler(async (req, res) => {
 export const getBoardController = asyncHandler(async (req, res) => {
   try {
     logger.debug(`${req.transactionID} Inside getBoardController controller`);
+
+    logger.debug(
+      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+    );
+
+    const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      logger.error(
+        `${req.transactionID} User does not exist, so throwing error`,
+      );
+
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
+    logger.debug(
+      `${req.transactionID} Validating the ObjectID passed as params`,
+    );
 
     await objectIdRequestMapper(req.params.boardId, req.transactionID);
 
@@ -128,21 +152,29 @@ export const updateBoardController = asyncHandler(async (req, res) => {
       `${req.transactionID} Inside updateBoardController controller`,
     );
 
-    await objectIdRequestMapper(req.params.boardId, req.transactionID);
-
     logger.debug(
-      `${req.transactionID} Fetching board details for board with ID ${req.params.boardId}`,
+      `${req.transactionID} Verifying is the userId in the token is present in the db`,
     );
 
-    const board = await Board.findById(req.params.boardId);
+    const user = await User.findById(res.locals.userId);
 
-    if (!board) {
+    if (!user) {
       logger.error(
-        `${req.transactionID} The board with ID ${req.params.boardId} does not exist, so throwing error`,
+        `${req.transactionID} User does not exist, so throwing error`,
       );
 
-      throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
     }
+
+    logger.debug(
+      `${req.transactionID} Validating the object ID ${req.params.boardId} passed as params`,
+    );
+
+    logger.debug(
+      `${req.transactionID} Validating the ObjectID passed as params`,
+    );
+
+    await objectIdRequestMapper(req.params.boardId, req.transactionID);
 
     logger.debug(`${req.transactionID} Validating the request body`);
 
@@ -170,6 +202,14 @@ export const updateBoardController = asyncHandler(async (req, res) => {
       result,
       { new: true },
     );
+
+    if (!updatedBoard) {
+      logger.error(
+        `${req.transactionID} The board with ID ${req.params.boardId} does not exist, so throwing error`,
+      );
+
+      throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
+    }
 
     logger.debug(
       `${req.transactionID} Board with ID ${updatedBoard._id} updated successfully`,
@@ -202,6 +242,24 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
       `${req.transactionID} Inside deleteBoardController controller`,
     );
 
+    logger.debug(
+      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+    );
+
+    const user = await User.findById(res.locals.userId);
+
+    if (!user) {
+      logger.error(
+        `${req.transactionID} User does not exist, so throwing error`,
+      );
+
+      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+    }
+
+    logger.debug(
+      `${req.transactionID} Validating the objectID passed as params`,
+    );
+
     await objectIdRequestMapper(req.params.boardId, req.transactionID);
 
     const deletedBoard = await Board.findByIdAndDelete(req.params.boardId);
@@ -218,17 +276,9 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
       `${req.transactionID} Removing boardID ${deletedBoard._id} from user ID's ${res.locals.userId} boards array`,
     );
 
-    const user = await User.findByIdAndUpdate(res.locals.userId, {
+    await User.findByIdAndUpdate(res.locals.userId, {
       $pull: { boards: req.params.boardId },
     });
-
-    if (!user) {
-      logger.error(
-        `${req.transactionID} User with ID ${res.locals.userId} does not exist, so throwing an error`,
-      );
-
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
-    }
 
     logger.debug(
       `${req.transactionID} Deleting all tasks present in the board with ID ${deletedBoard._id}`,

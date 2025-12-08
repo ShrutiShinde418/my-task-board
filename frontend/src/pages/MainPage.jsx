@@ -21,6 +21,7 @@ const MainPage = () => {
             taskLogo={taskHeader.icon}
             bgColor={taskHeader.bgColor}
             iconBgColor={taskHeader.iconBgColor}
+            tasks={tasksState.taskStore[taskHeader.prop]}
           />
         ))}
         <AddNewTask />

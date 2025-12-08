@@ -1,5 +1,9 @@
 import { useSelector, useDispatch } from "react-redux";
-import { openOffCanvas, closeOffCanvas } from "../store/newTaskSlice.js";
+import {
+  openOffCanvas,
+  closeOffCanvas,
+  addTask,
+} from "../store/newTaskSlice.js";
 
 export const useTaskSlice = () => {
   const dispatch = useDispatch();
@@ -13,9 +17,14 @@ export const useTaskSlice = () => {
     dispatch(openOffCanvas());
   };
 
+  const addNewTaskHandler = (type, task) => {
+    dispatch(addTask({ type, task }));
+  };
+
   return {
     tasks,
     closeOffCanvasHandler,
     openOffCanvasHandler,
+    addNewTaskHandler,
   };
 };
