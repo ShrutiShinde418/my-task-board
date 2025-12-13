@@ -467,7 +467,30 @@ describe("Integration testcases for tasks controller", function () {
         assert.equal(response.body.error.code, 422);
         assert.equal(
           response.body.error.message,
-          "Invalid input: expected string, received undefined, Invalid input: expected string, received undefined",
+          "At least one key (name, description, status, or icon) must be present.",
+        );
+      });
+
+      it("should fail to update a task when the name parameter is passed as null", async () => {
+        const requestBody = {
+          name: null,
+        };
+
+        const response = await request(app)
+          .put(`/api/tasks/${result.task._id}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 400);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 422);
+        assert.equal(
+          response.body.error.message,
+          "Invalid input: expected string, received null",
         );
       });
 
@@ -573,6 +596,115 @@ describe("Integration testcases for tasks controller", function () {
 
       afterAll(async () => {
         await helper.removeUser(result.userId);
+      });
+    });
+
+    describe("Positive testcases for updateTaskController Board", () => {
+      beforeAll(async () => {
+        result = await helper.createUserWithBoard();
+
+        const { task } = await helper.createSingleRandomTaskHandler(
+          result.boardId,
+          result.token,
+        );
+
+        result = { ...result, task };
+      });
+
+      it("should successfully update a task's name", async () => {
+        const requestBody = {
+          name: "Complete MERN Stack Course",
+        };
+
+        const response = await request(app)
+          .put(`/api/tasks/${result.task._id}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 200);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, true);
+        assert.exists(response.body.task);
+        assert.equal(response.body.task._id, result.task._id);
+        assert.equal(response.body.task.name, requestBody.name);
+      });
+
+      it("should successfully update a task's description", async () => {
+        const requestBody = {
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam gravida ligula ligula, non semper sapien rutrum eget. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
+        };
+
+        const response = await request(app)
+          .put(`/api/tasks/${result.task._id}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 200);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, true);
+        assert.exists(response.body.task);
+        assert.equal(response.body.task._id, result.task._id);
+        assert.equal(response.body.task.description, requestBody.description);
+      });
+
+      it("should successfully update a task's status to completed", async () => {
+        const requestBody = {
+          status: "completed",
+        };
+
+        const response = await request(app)
+          .put(`/api/tasks/${result.task._id}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 200);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, true);
+        assert.exists(response.body.task);
+        assert.equal(response.body.task._id, result.task._id);
+        assert.equal(response.body.task.status, requestBody.status);
+      });
+
+      it("should successfully update a task's status to inProgress", async () => {
+        const requestBody = {
+          status: "inProgress",
+        };
+
+        const response = await request(app)
+          .put(`/api/tasks/${result.task._id}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 200);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, true);
+        assert.exists(response.body.task);
+        assert.equal(response.body.task._id, result.task._id);
+        assert.equal(response.body.task.status, requestBody.status);
+      });
+
+      afterAll(async () => {
+        await helper.removeUser(result.userId);
+      });
+    });
+  });
+
+  describe("Integration testcases for deleteTaskController", () => {
+    describe("Negative testcases for deleteTaskController", () => {
+      beforeAll(async () => {
+        result = await helper.createUserWithBoard();
+
+        const { task } = await helper.createSingleRandomTaskHandler(
+          result.boardId,
+          result.token,
+        );
+
+        result = { ...result, task };
       });
     });
   });

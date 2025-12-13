@@ -3,6 +3,7 @@ backend/node_modules
 backend/.env.local
 backend/.env.test
 backend/.env.prod
+frontend/.env
 backend/logs
 .vscode
 .idea

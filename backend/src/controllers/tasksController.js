@@ -178,28 +178,40 @@ export const updateTaskController = asyncHandler(async (req, res) => {
 
     logger.debug(`${req.transactionID} Validating the request body`);
 
-    const taskSchema = z.strictObject(
-      {
-        name: z
-          .string()
-          .trim()
-          .min(5, { error: "Task should have at least 5 characters" })
-          .optional(),
-        description: z
-          .string()
-          .trim()
-          .min(5, {
-            error: "Description should have at least 5 characters",
-          })
-          .optional(),
-        status: z
-          .enum(["inProgress", "completed", "wontDo", "toDo"])
-          .default("toDo")
-          .optional(),
-        icon: z.string().trim().optional().nullable(),
-      },
-      { error: constants.UNKNOWN_PARAMETERS },
-    );
+    const taskSchema = z
+      .strictObject(
+        {
+          name: z
+            .string()
+            .trim()
+            .min(5, { error: "Task should have at least 5 characters" })
+            .optional(),
+          description: z
+            .string()
+            .trim()
+            .min(5, {
+              error: "Description should have at least 5 characters",
+            })
+            .optional(),
+          status: z
+            .enum(["inProgress", "completed", "wontDo", "toDo"])
+            .optional(),
+          icon: z.string().trim().optional(),
+        },
+        { error: constants.UNKNOWN_PARAMETERS },
+      )
+      .refine(
+        (data) => {
+          return Object.values(data).some(
+            (value) => value !== undefined || true,
+          );
+        },
+        {
+          message:
+            "At least one key (name, description, status, or icon) must be present.",
+          path: [],
+        },
+      );
 
     const result = await taskSchema.parseAsync(req.body);
 

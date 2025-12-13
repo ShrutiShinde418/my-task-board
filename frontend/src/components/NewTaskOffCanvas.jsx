@@ -4,13 +4,15 @@ import deleteIcon from "../assets/Trash.svg";
 import saveIcon from "../assets/Done_round_duotone.svg";
 import { useTaskSlice } from "../hooks/useTaskSlice.js";
 import IconChip from "./IconChip.jsx";
-import { iconData } from "../utils/helpers.js";
+import StatusButton from "./StatusButton.jsx";
+import { iconData, statusButtons } from "../utils/helpers.js";
 
 const NewTaskOffCanvas = () => {
   const { closeOffCanvasHandler, addNewTaskHandler } = useTaskSlice();
 
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -67,9 +69,17 @@ const NewTaskOffCanvas = () => {
         </div>
         <div>
           <p className="text-gray text-sm">Status</p>
-          <div className="flex gap-3">
-            {iconData.map((icon) => (
-              <IconChip id={icon.id} key={icon.id} labelContent={icon.emoji} />
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 w-full">
+            {statusButtons.map((btn) => (
+              <StatusButton
+                id={btn.id}
+                key={btn.id}
+                title={btn.title}
+                imgURL={btn.image}
+                bgColor={btn.bgColor}
+                setSelectedId={setSelectedId}
+                selectedId={selectedId}
+              />
             ))}
           </div>
         </div>

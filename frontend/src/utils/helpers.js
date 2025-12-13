@@ -1,6 +1,10 @@
 import taskProgressIcon from "../assets/Time_atack_duotone.svg";
 import wontDoTaskIcon from "../assets/close_ring_duotone-1.svg";
+import wontDoTaskImage from "../assets/close_ring_duotone.svg";
 import taskDoneIcon from "../assets/Done_round_duotone.svg";
+
+export const backendURLLocal = import.meta.env.VITE_BACKEND_URL_LOCAL;
+export const backendURLProd = import.meta.env.VITE_BACKEND_URL_PROD;
 
 export const taskHeaders = [
   {
@@ -64,5 +68,26 @@ export const iconData = [
   {
     id: 6,
     emoji: "⏰",
+  },
+];
+
+export const statusButtons = [
+  {
+    id: 1,
+    title: "In Progress",
+    image: taskProgressIcon,
+    bgColor: "bg-orange",
+  },
+  {
+    id: 2,
+    title: "Completed",
+    image: taskDoneIcon,
+    bgColor: "bg-green",
+  },
+  {
+    id: 3,
+    title: "Won't Do",
+    image: wontDoTaskImage,
+    bgColor: "bg-red",
   },
 ];
