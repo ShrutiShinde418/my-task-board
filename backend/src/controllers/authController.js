@@ -45,9 +45,15 @@ export const signup = asyncHandler(async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(result.password, 12);
 
+    const board = await Board.create({
+      name: "My Task Board",
+      description: "Tasks to keep organised",
+    });
+
     const newUser = await User.create({
       email: result.email,
       password: hashedPassword,
+      boards: [board._id],
     });
 
     logger.debug(
@@ -56,7 +62,7 @@ export const signup = asyncHandler(async (req, res) => {
 
     return res.send(
       createSuccessResponse(req, res, {
-        message: `User successfully created with ObjectID ${newUser._id}`,
+        message: `User successfully created with ObjectID ${newUser._id} and boardID ${board._id}`,
       }),
     );
   } catch (e) {

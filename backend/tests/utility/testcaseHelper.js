@@ -26,7 +26,7 @@ export class TestcaseHelper {
     );
 
     const arr = response.body.message.split(" ");
-    const userId = arr[arr.length - 1];
+    const userId = arr[arr.length - 4];
 
     const loginResponse = await request(app)
       .post("/api/login")

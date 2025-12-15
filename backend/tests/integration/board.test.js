@@ -364,6 +364,8 @@ describe("Integration testcases for board controller", function () {
       it("should fail to update a board when the token passed is of a user that doesn't exist", async () => {
         const newUser = await helper.createUserWithBoard();
 
+        await helper.removeUser(newUser.userId);
+
         const requestBody = {
           name: "My New Task Board",
         };
@@ -417,7 +419,7 @@ describe("Integration testcases for board controller", function () {
         assert.equal(response.body.error.code, 422);
         assert.equal(
           response.body.error.message,
-          "Task should have at least 5 characters",
+          "Board name should have at least 5 characters",
         );
       });
 
@@ -611,7 +613,7 @@ describe("Integration testcases for board controller", function () {
         assert.equal(userDetailsResponse.body.success, true);
         assert.exists(userDetailsResponse.body.boards);
         assert.isArray(userDetailsResponse.body.boards);
-        assert.lengthOf(userDetailsResponse.body.boards, 2);
+        assert.lengthOf(userDetailsResponse.body.boards, 3);
         const boardIds = userDetailsResponse.body.boards.map(
           (board) => board._id,
         );

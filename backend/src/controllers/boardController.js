@@ -183,7 +183,7 @@ export const updateBoardController = asyncHandler(async (req, res) => {
         name: z
           .string()
           .trim()
-          .min(5, { error: "Task should have at least 5 characters" }),
+          .min(5, { error: "Board name should have at least 5 characters" }),
         description: z
           .string()
           .trim()

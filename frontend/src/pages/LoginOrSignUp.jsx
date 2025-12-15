@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useId, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { useFetch } from "../hooks/useFetch.js";
-import { signup, login } from "../utils/http.js";
+import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useFetch } from "../hooks/useFetch.js";
+import { signup, login, getUserDetails } from "../utils/http.js";
 
 const LoginOrSignUp = () => {
   const navigate = useNavigate();
@@ -35,7 +35,6 @@ const LoginOrSignUp = () => {
   });
 
   const handleSubmit = (e) => {
-    console.log(isSignUp);
     e.preventDefault();
     if (isSignUp) {
       signupRefetch();
@@ -64,9 +63,31 @@ const LoginOrSignUp = () => {
     }
 
     if (loginData?.status === 200) {
+      if (!toast.isActive(toastId.current)) {
+        toastId.current = toast.success("Logged in successfully");
+      }
       navigate("/home");
     }
-  }, [id, loginData?.status, loginError, navigate, signupError]);
+
+    if (signupData?.status === 200) {
+      if (!toast.isActive(toastId.current)) {
+        toastId.current = toast.success(
+          "User created successfully, please log in",
+        );
+      }
+      setIsSignUp(false);
+      setEmail("");
+      setPassword("");
+    }
+  }, [id, loginData, loginError, navigate, signupData?.status, signupError]);
+
+  const { data } = useFetch(["getUserDetails"], () => getUserDetails(), {
+    retry: false,
+  });
+
+  if (data?.status === 200) {
+    return <Navigate to="/home" replace />;
+  }
 
   return (
     <div className="font-custom min-h-screen flex items-center justify-center p-4">

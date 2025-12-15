@@ -706,6 +706,35 @@ describe("Integration testcases for tasks controller", function () {
 
         result = { ...result, task };
       });
+
+      it("should fail to delete a task when the user doesn't exist", () => {});
+
+      it("should fail to delete a task when an invalid ObjectID is passed as the query params", () => {});
+
+      it("should fail to delete a task when the task to be deleted does not exist", () => {});
+
+      afterAll(async () => {
+        await helper.removeUser(result.userId);
+      });
+    });
+
+    describe("Positive testcases for deleteTaskController", () => {
+      beforeAll(async () => {
+        result = await helper.createUserWithBoard();
+
+        const { task } = await helper.createSingleRandomTaskHandler(
+          result.boardId,
+          result.token,
+        );
+
+        result = { ...result, task };
+      });
+
+      it("should successfully delete a created task", () => {});
+
+      afterAll(async () => {
+        await helper.removeUser(result.userId);
+      });
     });
   });
 });

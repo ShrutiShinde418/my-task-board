@@ -3,7 +3,8 @@ import {
   openOffCanvas,
   closeOffCanvas,
   addTask,
-} from "../store/newTaskSlice.js";
+  updateTaskStore,
+} from "../store/tasksSlice.js";
 
 export const useTaskSlice = () => {
   const dispatch = useDispatch();
@@ -21,10 +22,15 @@ export const useTaskSlice = () => {
     dispatch(addTask({ type, task }));
   };
 
+  const updateTaskStoreHandler = (tasks) => {
+    dispatch(updateTaskStore(tasks));
+  };
+
   return {
     tasks,
     closeOffCanvasHandler,
     openOffCanvasHandler,
     addNewTaskHandler,
+    updateTaskStoreHandler,
   };
 };

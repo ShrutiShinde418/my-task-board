@@ -4,7 +4,7 @@ import { backendURLLocal } from "./helpers.js";
 
 export const login = async (email, password) => {
   return await axios.post(
-    `${backendURLLocal}/api/login`,
+    `${backendURLLocal}/login`,
     {
       email,
       password,
@@ -19,7 +19,7 @@ export const login = async (email, password) => {
 
 export const signup = async (email, password) => {
   return await axios.post(
-    `${backendURLLocal}/api/signup`,
+    `${backendURLLocal}/signup`,
     {
       email,
       password,
@@ -33,7 +33,19 @@ export const signup = async (email, password) => {
 };
 
 export const getUserDetails = async () => {
-  return axios.get(`${backendURLLocal}/api/get/user/details`, {
+  return axios.get(`${backendURLLocal}/get/user/details`, {
     headers: { "Content-Type": "application/json" },
+  });
+};
+
+export const handleMutation = async (httpMethod, url, params, requestBody) => {
+  return await axios({
+    baseURL: backendURLLocal,
+    url: params ? `${url}/${params}` : url,
+    method: httpMethod.toUpperCase(),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: requestBody,
   });
 };

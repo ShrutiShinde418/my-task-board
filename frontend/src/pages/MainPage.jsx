@@ -1,13 +1,13 @@
+import { useTaskSlice } from "../hooks/useTaskSlice.js";
 import AddNewTask from "../components/AddNewTask";
 import Header from "../components/Header";
 import TaskHeader from "../components/TaskHeader";
 import { taskHeaders } from "../utils/helpers";
-import { useSelector } from "react-redux";
 import Modal from "../components/Modal.jsx";
 import NewTaskOffCanvas from "../components/NewTaskOffCanvas.jsx";
 
 const MainPage = () => {
-  const tasksState = useSelector((state) => state.tasks);
+  const { tasks: tasksState } = useTaskSlice();
 
   return (
     <div className="font-custom lg:max-w-lg md:max-w-xl md:mx-auto mx-10 my-10">

@@ -21,7 +21,7 @@ const TaskHeader = ({ icon, title, taskLogo, bgColor, iconBgColor, tasks }) => {
       {tasks?.length > 0 && (
         <ul className={`flex flex-col gap-1 mt-4 ml-3`}>
           {tasks?.map((task) => (
-            <Task taskTitle={task.taskTitle} key={task.id} />
+            <Task taskTitle={task.name} key={task._id} />
           ))}
         </ul>
       )}

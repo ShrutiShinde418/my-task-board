@@ -128,7 +128,7 @@ describe("Integration Tests for signup controller", () => {
       assert.notExists(response.body.error?.name);
 
       const arr = response.body.message.split(" ");
-      const userId = arr[arr.length - 1];
+      const userId = arr[arr.length - 4];
 
       const removeUserResponse = await request(app)
         .post(`/api/remove/user/${userId}`)
@@ -139,7 +139,7 @@ describe("Integration Tests for signup controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
+        `User with id ${userId} removed successfully with 1 board(s) deleted and 0 task(s) deleted`,
       );
     });
 
@@ -281,7 +281,7 @@ describe("Integration Tests for signup controller", () => {
       );
 
       const arr = response.body.message.split(" ");
-      const userId = arr[arr.length - 1];
+      const userId = arr[arr.length - 4];
 
       const removeUserResponse = await request(app)
         .post(`/api/remove/user/${userId}`)
@@ -292,7 +292,7 @@ describe("Integration Tests for signup controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
+        `User with id ${userId} removed successfully with 1 board(s) deleted and 0 task(s) deleted`,
       );
     });
   });

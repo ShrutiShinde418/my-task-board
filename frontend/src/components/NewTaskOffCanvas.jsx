@@ -1,23 +1,70 @@
-import { useState } from "react";
-import close from "../assets/close_ring_duotone-1.svg";
-import deleteIcon from "../assets/Trash.svg";
-import saveIcon from "../assets/Done_round_duotone.svg";
+import { useState, useEffect, useId } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { useTaskSlice } from "../hooks/useTaskSlice.js";
+import { iconData, POST, statusButtons } from "../utils/helpers.js";
+import { useMutationHandler } from "../hooks/useMutationHandler.js";
+import { handleMutation } from "../utils/http.js";
+import { useUser } from "../hooks/useUser.js";
 import IconChip from "./IconChip.jsx";
 import StatusButton from "./StatusButton.jsx";
-import { iconData, statusButtons } from "../utils/helpers.js";
+import saveIcon from "../assets/Done_round_duotone.svg";
+import deleteIcon from "../assets/Trash.svg";
+import close from "../assets/close_ring_duotone-1.svg";
 
 const NewTaskOffCanvas = () => {
-  const { closeOffCanvasHandler, addNewTaskHandler } = useTaskSlice();
+  const id = useId();
+  const { closeOffCanvasHandler } = useTaskSlice();
+  const { user: data } = useUser();
+  const client = useQueryClient();
 
   const [taskTitle, setTaskTitle] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
-  const [selectedId, setSelectedId] = useState(null);
+  const [taskDescription, setTaskDescription] = useState();
+  const [selectedId, setSelectedId] = useState("toDo");
+
+  const { mutate, isSuccess, error } = useMutationHandler(
+    (requestBody) =>
+      handleMutation(POST, "/tasks/create", null, {
+        name: requestBody.taskTitle,
+        description: requestBody.taskDescription,
+        status: requestBody.selectedId,
+        boardId: requestBody.boardId,
+      }),
+    "createTask",
+    () => {
+      client.invalidateQueries(["getUserDetails"]);
+    },
+    (error) => {
+      return error?.response?.data?.error?.message ?? "Failed to create task";
+    },
+  );
+
+  console.log(error);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    addNewTaskHandler();
+    mutate({
+      taskTitle,
+      taskDescription,
+      selectedId: selectedId.split("-")[1],
+      boardId: data?.user?.boards[0]?._id,
+    });
+    closeOffCanvasHandler();
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Task successfully created", {
+        toastId: id,
+      });
+    }
+
+    if (error) {
+      toast.error(error, {
+        toastId: id,
+      });
+    }
+  }, [error, id, isSuccess]);
 
   return (
     <div className="p-6 flex flex-col font-custom">
@@ -43,6 +90,7 @@ const NewTaskOffCanvas = () => {
             placeholder="Enter your task name"
             className="py-2 px-4 border border-gray rounded-md"
             onChange={(e) => setTaskTitle(e.target.value)}
+            required={true}
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -91,7 +139,10 @@ const NewTaskOffCanvas = () => {
             Delete
             <img src={deleteIcon} alt="Delete" />
           </button>
-          <button className="flex gap-1 bg-blue text-white px-6 py-2 rounded-3xl">
+          <button
+            className="flex gap-1 bg-blue text-white px-6 py-2 rounded-3xl"
+            type={"submit"}
+          >
             Save
             <img src={saveIcon} alt="Save" />
           </button>

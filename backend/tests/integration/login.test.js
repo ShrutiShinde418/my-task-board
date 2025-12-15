@@ -251,7 +251,7 @@ describe("Integration Tests for login controller", () => {
       );
 
       const arr = response.body.message.split(" ");
-      const userId = arr[arr.length - 1];
+      const userId = arr[arr.length - 4];
 
       const loginResponse = await request(app)
         .post("/api/login")
@@ -278,7 +278,7 @@ describe("Integration Tests for login controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
+        `User with id ${userId} removed successfully with 1 board(s) deleted and 0 task(s) deleted`,
       );
     });
   });
@@ -304,7 +304,7 @@ describe("Integration Tests for login controller", () => {
       );
 
       const arr = response.body.message.split(" ");
-      const userId = arr[arr.length - 1];
+      const userId = arr[arr.length - 4];
 
       const loginResponse = await request(app)
         .post("/api/login")
@@ -320,7 +320,7 @@ describe("Integration Tests for login controller", () => {
       );
       assert.exists(loginResponse.body.boards);
       assert.isArray(loginResponse.body.boards);
-      assert.isEmpty(loginResponse.body.boards);
+      assert.lengthOf(loginResponse.body.boards, 1);
       assert.isNotEmpty(loginResponse.headers["set-cookie"]);
       assert.include(loginResponse.headers["set-cookie"][0], "token");
       assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");
@@ -335,7 +335,7 @@ describe("Integration Tests for login controller", () => {
       assert.equal(removeUserResponse.body.success, true);
       assert.equal(
         removeUserResponse.body.message,
-        `User with id ${userId} removed successfully with 0 board(s) deleted and 0 task(s) deleted`,
+        `User with id ${userId} removed successfully with 1 board(s) deleted and 0 task(s) deleted`,
       );
     });
   });

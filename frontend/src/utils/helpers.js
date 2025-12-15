@@ -5,6 +5,10 @@ import taskDoneIcon from "../assets/Done_round_duotone.svg";
 
 export const backendURLLocal = import.meta.env.VITE_BACKEND_URL_LOCAL;
 export const backendURLProd = import.meta.env.VITE_BACKEND_URL_PROD;
+export const POST = "POST";
+export const DELETE = "DELETE";
+export const PUT = "PUT";
+export const PATCH = "PATCH";
 
 export const taskHeaders = [
   {
@@ -73,19 +77,19 @@ export const iconData = [
 
 export const statusButtons = [
   {
-    id: 1,
+    id: "inProgress",
     title: "In Progress",
     image: taskProgressIcon,
     bgColor: "bg-orange",
   },
   {
-    id: 2,
+    id: "completed",
     title: "Completed",
     image: taskDoneIcon,
     bgColor: "bg-green",
   },
   {
-    id: 3,
+    id: "wontDo",
     title: "Won't Do",
     image: wontDoTaskImage,
     bgColor: "bg-red",

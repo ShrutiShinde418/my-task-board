@@ -53,33 +53,44 @@ export const createTaskController = asyncHandler(async (req, res) => {
 
     logger.debug(`${req.transactionID} Validating the request body`);
 
-    const taskSchema = z.strictObject(
-      {
-        name: z
-          .string()
-          .trim()
-          .min(5, { error: "Task should have at least 5 characters" }),
-        description: z
-          .string()
-          .trim()
-          .min(5, { error: "Description should have at least 5 characters" })
-          .optional(),
-        status: z
-          .enum(["inProgress", "completed", "wontDo", "toDo"])
-          .default("toDo"),
-        icon: z.string().trim().optional().nullable(),
-        boardId: z
-          .string()
-          .trim()
-          .refine(
-            (val) => {
-              return mongoose.Types.ObjectId.isValid(val);
-            },
-            { error: "ObjectId passed is invalid" },
-          ),
-      },
-      { error: constants.UNKNOWN_PARAMETERS },
-    );
+    const taskSchema = z
+      .strictObject(
+        {
+          name: z
+            .string()
+            .trim()
+            .min(5, { error: "Task should have at least 5 characters" }),
+          description: z
+            .string()
+            .trim()
+            .min(5, { error: "Description should have at least 5 characters" })
+            .optional(),
+          status: z
+            .enum(["inProgress", "completed", "wontDo", "toDo"])
+            .default("toDo")
+            .optional(),
+          icon: z.string().trim().optional().nullable(),
+          boardId: z
+            .string()
+            .trim()
+            .refine(
+              (val) => {
+                return mongoose.Types.ObjectId.isValid(val);
+              },
+              { error: "ObjectId passed is invalid" },
+            ),
+        },
+        { error: constants.UNKNOWN_PARAMETERS },
+      )
+      .refine(
+        (data) => {
+          return !!data.name;
+        },
+        {
+          message: "Task name is required",
+          path: ["name"],
+        },
+      );
 
     const result = await taskSchema.parseAsync(req.body);
 

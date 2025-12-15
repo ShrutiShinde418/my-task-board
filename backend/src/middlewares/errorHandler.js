@@ -15,9 +15,9 @@ import { createErrorResponse } from "../models/responseMapper.js";
  *
  * @function errorHandler
  * @param {Error|ErrorResponse|SyntaxError} err - The error object thrown during request handling.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @param {Function} next - Express next middleware function.
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @param {import("express").NextFunction} next - Express next middleware function.
  *
  * @returns {import("express").Response} JSON error response formatted by `createErrorResponse`.
  */
@@ -27,7 +27,7 @@ const errorHandler = (err, req, res, next) => {
     req.txnStart = Date.now();
 
     logger.error(
-      `${req.transactionID} Request body contains invalid JSON, so throwing an error`,
+      `${req.transactionID} Request body contains invalid JSON, so throwing an error`
     );
 
     return res.send(
@@ -35,8 +35,8 @@ const errorHandler = (err, req, res, next) => {
         req,
         res,
         new ErrorResponse(Constants.INVALID_JSON, 422),
-        400,
-      ),
+        400
+      )
     );
   }
 
@@ -46,7 +46,9 @@ const errorHandler = (err, req, res, next) => {
 
   if (err instanceof Error) {
     logger.error(
-      `${req.transactionID} Internal Communication Error occurred :: ${err}, ${JSON.stringify(err)}`,
+      `${
+        req.transactionID
+      } Internal Communication Error occurred :: ${err}, ${JSON.stringify(err)}`
     );
 
     return res.send(
@@ -54,8 +56,8 @@ const errorHandler = (err, req, res, next) => {
         req,
         res,
         new ErrorResponse(Constants.INTERNAL_COMMUNICATION_EXCEPTION, 500),
-        500,
-      ),
+        500
+      )
     );
   }
 };
