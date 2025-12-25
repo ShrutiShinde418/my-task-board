@@ -471,6 +471,75 @@ describe("Integration testcases for board controller", function () {
           "The request includes unsupported or unrecognized parameter(s).",
         );
       });
+
+      it("should fail to update a board when an empty request body is passed", async () => {
+        const requestBody = {};
+
+        const response = await request(app)
+          .put(`/api/boards/${result.boardId}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 400);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, false);
+        assert.isNotEmpty(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 422);
+        assert.equal(
+          response.body.error.message,
+          "At least one key (name, description) must be present.",
+        );
+      });
+
+      it("should fail to update a board when the name is passed as null", async () => {
+        const requestBody = {
+          name: null,
+          description: "Development tasks to be done by the next sprint",
+        };
+
+        const response = await request(app)
+          .put(`/api/boards/${result.boardId}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 400);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, false);
+        assert.isNotEmpty(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 422);
+        assert.equal(
+          response.body.error.message,
+          "Invalid input: expected string, received null",
+        );
+      });
+
+      it("should fail to update a board when the description is passed as an empty string", async () => {
+        const requestBody = {
+          name: "Courses to Complete",
+          description: "",
+        };
+
+        const response = await request(app)
+          .put(`/api/boards/${result.boardId}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 400);
+        assert.isNotEmpty(response.body);
+        assert.equal(response.body.success, false);
+        assert.isNotEmpty(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 422);
+        assert.equal(
+          response.body.error.message,
+          "Description should have at least 5 characters",
+        );
+      });
     });
 
     describe("Positive testcases for update board controller", () => {

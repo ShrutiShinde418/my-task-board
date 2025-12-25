@@ -3,6 +3,24 @@ import { createErrorResponse } from "../models/responseMapper.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import Constants from "../utils/constants.js";
 
+/**
+ * Authentication middleware to verify JWT from cookies.
+ *
+ * - Expects a `token` cookie containing a valid JWT.
+ * - Verifies the token using `jose.jwtVerify`.
+ * - On success, sets `res.locals.userId` from the token payload and calls `next()`.
+ * - On failure, sends a standardized error response.
+ *
+ * @async
+ * @function authMiddleware
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
+ *
+ * @returns {Promise<void>} Sends an error response or calls `next()`.
+ *
+ * @throws {Error} When JWT verification fails due to unexpected errors.
+ */
 export const authMiddleware = async (req, res, next) => {
   try {
     logger.debug(`${req.transactionID} Inside authMiddleware`);

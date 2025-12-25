@@ -10,7 +10,7 @@ const StatusButton = ({
 }) => {
   const onChangeHandler = (e) => {
     if (e.target.checked) {
-      setSelectedId(e.target.id); // update parent state
+      setSelectedId(e.target.id);
     }
   };
 
@@ -22,10 +22,13 @@ const StatusButton = ({
         id={`btn-${id}`}
         className="h-0 w-0 hidden peer"
         onChange={onChangeHandler}
+        checked={selectedId === `btn-${id}}`}
       />
       <label
         htmlFor={`btn-${id}`}
-        className="rounded-xl border-2 border-lightGray peer-checked:border-blue flex items-center pl-0.5 py-0.5 pr-4"
+        className={`rounded-xl border-2 flex items-center pl-0.5 py-0.5 pr-4 ${
+          selectedId === "btn-" + id ? "border-blue" : "border-lightGray"
+        }`}
       >
         <div className="flex items-center gap-3">
           <img

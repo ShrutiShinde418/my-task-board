@@ -15,11 +15,15 @@ const Header = () => {
 
   const [editTaskBoard, setEditTaskBoard] = useState(false);
   const [taskBoardName, setTaskBoardName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [description, setDescription] = useState(
+    data?.user?.boards[0]?.description || "",
+  );
 
-  const { mutate, error } = useMutationHandler(
+  const { mutate, error, isPending } = useMutationHandler(
     (variables) =>
       handleMutation(PUT, "/boards", data?.user?.boards[0]?._id, {
-        name: variables.name,
+        [variables.property]: variables.propertyValue,
       }),
     "updateBoardName",
     () => {
@@ -27,12 +31,34 @@ const Header = () => {
     },
   );
 
+  const handleSave = () => {
+    if (description !== data?.user?.boards[0]?.description) {
+      mutate({ property: "description", propertyValue: description });
+      setIsEditing(false);
+    } else {
+      setIsEditing(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setDescription(data?.user?.boards[0]?.description || "");
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSave();
+    } else if (e.key === "Escape") {
+      handleCancel();
+    }
+  };
+
   const editTaskBoardHandler = () => {
     setEditTaskBoard((prevState) => {
       const newState = !prevState;
 
       if (!newState && taskBoardName.trim() !== "") {
-        mutate({ name: taskBoardName });
+        mutate({ property: "name", propertyValue: taskBoardName });
       }
 
       return newState;
@@ -69,7 +95,41 @@ const Header = () => {
         </button>
       </header>
       <div className="ml-14 mt-4">
-        <h2 className="font-normal">{data?.user?.boards[0]?.description}</h2>
+        {isEditing ? (
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={data?.user?.boards[0]?.description || ""}
+              className="p-2"
+              autoFocus
+              disabled={isPending}
+            />
+            <button
+              onClick={handleSave}
+              disabled={isPending}
+              className="px-5 py-2 bg-blue text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save
+            </button>
+            <button
+              onClick={handleCancel}
+              disabled={isPending}
+              className="px-4 py-2 bg-gray text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <h2
+            className="font-normal cursor-pointer hover:bg-gray-100 rounded px-1 -ml-1"
+            onClick={() => setIsEditing(true)}
+          >
+            {data?.user?.boards[0]?.description || "Click to add description"}
+          </h2>
+        )}
       </div>
     </>
   );

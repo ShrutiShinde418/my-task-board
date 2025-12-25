@@ -13,6 +13,7 @@ const tasksSlice = createSlice({
   initialState: {
     showOffCanvas: false,
     taskStore: initialTaskStoreState,
+    taskToUpdate: null,
   },
   reducers: {
     openOffCanvas: (state) => {
@@ -42,10 +43,18 @@ const tasksSlice = createSlice({
         }, {});
       }
     },
+    setTaskToUpdate: (state, action) => {
+      state.taskToUpdate = action.payload;
+    },
   },
 });
 
 export default tasksSlice.reducer;
 
-export const { openOffCanvas, closeOffCanvas, addTask, updateTaskStore } =
-  tasksSlice.actions;
+export const {
+  openOffCanvas,
+  closeOffCanvas,
+  addTask,
+  updateTaskStore,
+  setTaskToUpdate,
+} = tasksSlice.actions;

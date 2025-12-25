@@ -494,6 +494,29 @@ describe("Integration testcases for tasks controller", function () {
         );
       });
 
+      it("should fail to update a task when the description is passed as an empty string", async () => {
+        const requestBody = {
+          description: "",
+        };
+
+        const response = await request(app)
+          .put(`/api/tasks/${result.task._id}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`)
+          .send(requestBody);
+
+        assert.equal(response.status, 400);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 422);
+        assert.equal(
+          response.body.error.message,
+          "Description should have at least 5 characters",
+        );
+      });
+
       it("should fail to update a task when request body contains invalid JSON", async () => {
         const requestBody = {
           name: "svojsfvspvksvpkvkf",
@@ -707,11 +730,57 @@ describe("Integration testcases for tasks controller", function () {
         result = { ...result, task };
       });
 
-      it("should fail to delete a task when the user doesn't exist", () => {});
+      it("should fail to delete a task when the user doesn't exist", async () => {
+        const newUser = await helper.createUserWithBoard();
 
-      it("should fail to delete a task when an invalid ObjectID is passed as the query params", () => {});
+        await helper.removeUser(newUser.userId);
 
-      it("should fail to delete a task when the task to be deleted does not exist", () => {});
+        const response = await request(app)
+          .delete(`/api/tasks/6941a3fef6195895de78985b`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${newUser.token}`);
+
+        assert.equal(response.status, 400);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 424);
+        assert.equal(response.body.error.message, "User doesn't exist");
+      });
+
+      it("should fail to delete a task when an invalid ObjectID is passed as the query params", async () => {
+        const response = await request(app)
+          .delete(`/api/tasks/6941a3fef6195895de78985bsdfjsdkfdkmfdd`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`);
+
+        assert.equal(response.status, 400);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 422);
+        assert.equal(response.body.error.message, "ObjectId passed is invalid");
+      });
+
+      it("should fail to delete a task when the task to be deleted does not exist", async () => {
+        const response = await request(app)
+          .delete(`/api/tasks/6941a3fef6195895de78985b`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`);
+
+        assert.equal(response.status, 400);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, false);
+        assert.exists(response.body.error);
+        assert.notExists(response.body.error.name);
+        assert.equal(response.body.error.code, 404);
+        assert.equal(
+          response.body.error.message,
+          "The requested resource could not be located",
+        );
+      });
 
       afterAll(async () => {
         await helper.removeUser(result.userId);
@@ -730,7 +799,21 @@ describe("Integration testcases for tasks controller", function () {
         result = { ...result, task };
       });
 
-      it("should successfully delete a created task", () => {});
+      it("should successfully delete a created task", async () => {
+        const response = await request(app)
+          .delete(`/api/tasks/${result.task._id}`)
+          .set("Content-Type", "application/json")
+          .set("Cookie", `token=${result.token}`);
+
+        assert.equal(response.status, 200);
+        assert.isNotNull(response.body);
+        assert.equal(response.body.success, true);
+        assert.exists(response.body.message);
+        assert.equal(
+          response.body.message,
+          `Task with ID ${result.task._id} deleted successfully`,
+        );
+      });
 
       afterAll(async () => {
         await helper.removeUser(result.userId);

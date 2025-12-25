@@ -170,28 +170,37 @@ export const updateBoardController = asyncHandler(async (req, res) => {
       `${req.transactionID} Validating the object ID ${req.params.boardId} passed as params`,
     );
 
-    logger.debug(
-      `${req.transactionID} Validating the ObjectID passed as params`,
-    );
-
     await objectIdRequestMapper(req.params.boardId, req.transactionID);
 
     logger.debug(`${req.transactionID} Validating the request body`);
 
-    const boardSchema = z.strictObject(
-      {
-        name: z
-          .string()
-          .trim()
-          .min(5, { error: "Board name should have at least 5 characters" }),
-        description: z
-          .string()
-          .trim()
-          .min(5, { error: "Description should have at least 5 characters" })
-          .optional(),
-      },
-      { error: constants.UNKNOWN_PARAMETERS },
-    );
+    const boardSchema = z
+      .strictObject(
+        {
+          name: z
+            .string()
+            .trim()
+            .min(5, { error: "Board name should have at least 5 characters" })
+            .optional(),
+          description: z
+            .string()
+            .trim()
+            .min(5, { error: "Description should have at least 5 characters" })
+            .optional(),
+        },
+        { error: constants.UNKNOWN_PARAMETERS },
+      )
+      .refine(
+        (data) => {
+          return Object.values(data).some(
+            (value) => value !== undefined || true,
+          );
+        },
+        {
+          message: "At least one key (name, description) must be present.",
+          path: [],
+        },
+      );
 
     const result = await boardSchema.parseAsync(req.body);
 

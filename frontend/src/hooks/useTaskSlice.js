@@ -4,6 +4,7 @@ import {
   closeOffCanvas,
   addTask,
   updateTaskStore,
+  setTaskToUpdate,
 } from "../store/tasksSlice.js";
 
 export const useTaskSlice = () => {
@@ -26,11 +27,16 @@ export const useTaskSlice = () => {
     dispatch(updateTaskStore(tasks));
   };
 
+  const setTaskToUpdateHandler = (task) => {
+    dispatch(setTaskToUpdate(task));
+  };
+
   return {
     tasks,
     closeOffCanvasHandler,
     openOffCanvasHandler,
     addNewTaskHandler,
     updateTaskStoreHandler,
+    setTaskToUpdateHandler,
   };
 };
