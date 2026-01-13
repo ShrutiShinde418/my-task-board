@@ -5,12 +5,14 @@ import TaskHeader from "../components/TaskHeader";
 import { taskHeaders } from "../utils/helpers";
 import Modal from "../components/Modal.jsx";
 import NewTaskOffCanvas from "../components/NewTaskOffCanvas.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 
 const MainPage = () => {
   const { tasks: tasksState } = useTaskSlice();
 
   return (
-    <div className="font-custom lg:max-w-lg md:max-w-xl md:mx-auto mx-10 my-10">
+    <div className="relative font-custom lg:max-w-lg md:max-w-xl md:mx-auto mx-10 my-10">
+      <Sidebar />
       <Header />
       <main className="mt-5 flex flex-col gap-5">
         {taskHeaders.map((taskHeader) => (

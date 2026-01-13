@@ -10,29 +10,29 @@ import EditIcon from "../assets/Edit_duotone.svg";
 
 const Header = () => {
   const id = useId();
-  const { user: data } = useUser();
+  const { user, activeBoard } = useUser();
   const client = useQueryClient();
 
   const [editTaskBoard, setEditTaskBoard] = useState(false);
   const [taskBoardName, setTaskBoardName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(
-    data?.user?.boards[0]?.description || "",
+    activeBoard?.description || ""
   );
 
   const { mutate, error, isPending } = useMutationHandler(
     (variables) =>
-      handleMutation(PUT, "/boards", data?.user?.boards[0]?._id, {
+      handleMutation(PUT, "/boards", activeBoard?._id, {
         [variables.property]: variables.propertyValue,
       }),
     "updateBoardName",
     () => {
       client.invalidateQueries(["getUserDetails"]);
-    },
+    }
   );
 
   const handleSave = () => {
-    if (description !== data?.user?.boards[0]?.description) {
+    if (description !== activeBoard?.description) {
       mutate({ property: "description", propertyValue: description });
       setIsEditing(false);
     } else {
@@ -41,7 +41,7 @@ const Header = () => {
   };
 
   const handleCancel = () => {
-    setDescription(data?.user?.boards[0]?.description || "");
+    setDescription(activeBoard?.description || "");
     setIsEditing(false);
   };
 
@@ -81,13 +81,13 @@ const Header = () => {
           <input
             type="text"
             className="text-4xl font-normal w-1/2"
-            placeholder={data?.user?.boards[0]?.name}
+            placeholder={activeBoard?.name}
             onChange={(e) => setTaskBoardName(e.target.value)}
             value={taskBoardName}
           />
         ) : (
           <h1 className="text-4xl font-normal">
-            {taskBoardName || data?.user?.boards[0]?.name}
+            {taskBoardName || activeBoard?.name}
           </h1>
         )}
         <button type="button" onClick={editTaskBoardHandler}>
@@ -102,7 +102,7 @@ const Header = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={data?.user?.boards[0]?.description || ""}
+              placeholder={activeBoard?.description || ""}
               className="p-2"
               autoFocus
               disabled={isPending}
@@ -127,7 +127,7 @@ const Header = () => {
             className="font-normal cursor-pointer hover:bg-gray-100 rounded px-1 -ml-1"
             onClick={() => setIsEditing(true)}
           >
-            {data?.user?.boards[0]?.description || "Click to add description"}
+            {activeBoard?.description || "Click to add description"}
           </h2>
         )}
       </div>

@@ -21,7 +21,7 @@ import close from "../assets/close_ring_duotone-1.svg";
 const NewTaskOffCanvas = () => {
   const id = useId();
   const { closeOffCanvasHandler, tasks } = useTaskSlice();
-  const { user: data } = useUser();
+  const { user, activeBoard } = useUser();
   const client = useQueryClient();
 
   const [taskTitle, setTaskTitle] = useState("");
@@ -46,7 +46,7 @@ const NewTaskOffCanvas = () => {
     },
     (error) => {
       return error?.response?.data?.error?.message ?? "Failed to create task";
-    },
+    }
   );
 
   const {
@@ -61,7 +61,7 @@ const NewTaskOffCanvas = () => {
     },
     (error) => {
       return error?.response?.data?.error?.message ?? "Failed to delete task";
-    },
+    }
   );
 
   const {
@@ -82,7 +82,7 @@ const NewTaskOffCanvas = () => {
     },
     (error) => {
       return error?.response?.data?.error?.message ?? "Failed to update task";
-    },
+    }
   );
 
   const submitHandler = (e) => {
@@ -92,7 +92,7 @@ const NewTaskOffCanvas = () => {
       taskTitle,
       taskDescription,
       selectedId: selectedId.split("-")[1],
-      ...(tasks.taskToUpdate ? {} : { boardId: data?.user?.boards[0]?._id }),
+      ...(tasks.taskToUpdate ? {} : { boardId: activeBoard?._id }),
     };
 
     (tasks.taskToUpdate ? updateTaskMutation : createTaskMutation)(payload);
@@ -120,7 +120,13 @@ const NewTaskOffCanvas = () => {
       });
     }
 
-    if (createTaskError || deleteTaskError) {
+    if (updateTaskMutationSuccess) {
+      toast.success("Task successfully updated", {
+        toastId: id,
+      });
+    }
+
+    if (createTaskError || deleteTaskError || updateTaskError) {
       toast.error(createTaskError, {
         toastId: id,
       });

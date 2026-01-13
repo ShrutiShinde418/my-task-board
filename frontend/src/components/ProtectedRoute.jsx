@@ -11,16 +11,20 @@ const ProtectedRoute = () => {
     () => getUserDetails(),
     {
       retry: false,
-    },
+    }
   );
 
-  const { setUserState } = useUser();
+  const { setUserState, setActiveBoardHandler } = useUser();
   const { updateTaskStoreHandler } = useTaskSlice();
 
   useEffect(() => {
     if (userData?.status === 200) {
+      const activeBoard = userData?.data?.boards?.find(
+        (board) => board._id === userData?.data?.lastVisitedBoard
+      );
+      setActiveBoardHandler(activeBoard);
       setUserState(userData.data);
-      updateTaskStoreHandler(userData?.data?.boards[0]?.tasks);
+      updateTaskStoreHandler(activeBoard?.tasks);
     }
   }, [userData]);
 

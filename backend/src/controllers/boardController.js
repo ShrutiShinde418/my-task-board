@@ -41,7 +41,7 @@ export const createBoardController = asyncHandler(async (req, res) => {
         `${req.transactionID} User does not exist, so throwing error`,
       );
 
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(`${req.transactionID} Creating a new board`);
@@ -98,7 +98,7 @@ export const getBoardController = asyncHandler(async (req, res) => {
         `${req.transactionID} User does not exist, so throwing error`,
       );
 
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(
@@ -163,7 +163,7 @@ export const updateBoardController = asyncHandler(async (req, res) => {
         `${req.transactionID} User does not exist, so throwing error`,
       );
 
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(
@@ -262,7 +262,7 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
         `${req.transactionID} User does not exist, so throwing error`,
       );
 
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(

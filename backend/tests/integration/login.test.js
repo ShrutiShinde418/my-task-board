@@ -227,8 +227,11 @@ describe("Integration Tests for login controller", () => {
       assert.equal(response.body.success, false);
       assert.isNotEmpty(response.body.error);
       assert.notExists(response.body.error.name);
-      assert.equal(response.body.error.code, 424);
-      assert.equal(response.body.error.message, "User doesn't exist");
+      assert.equal(response.body.error.code, 425);
+      assert.equal(
+        response.body.error.message,
+        "Either email or password is invalid",
+      );
     });
 
     it("should fail to login user when the password does not match", async () => {

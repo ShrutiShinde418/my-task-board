@@ -66,7 +66,7 @@ const LoginOrSignUp = () => {
       if (!toast.isActive(toastId.current)) {
         toastId.current = toast.success("Logged in successfully");
       }
-      navigate("/home");
+      navigate("/home", { replace: true });
     }
 
     if (signupData?.status === 200) {

@@ -9,4 +9,5 @@ export default Object.freeze({
   EMAIL_OR_PASSWORD_IS_INVALID: "Either email or password is invalid",
   AUTHENTICATION_FAILED: "Authentication failed",
   TOKEN_EXPIRED: "The authentication token has expired",
+  SOMETHING_WENT_WRONG: "Something went wrong",
 });

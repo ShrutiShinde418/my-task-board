@@ -54,6 +54,7 @@ export const signup = asyncHandler(async (req, res) => {
       email: result.email,
       password: hashedPassword,
       boards: [board._id],
+      lastVisitedBoard: [board._id],
     });
 
     logger.debug(
@@ -100,10 +101,10 @@ export const login = asyncHandler(async (req, res) => {
 
     if (!existingUser) {
       logger.error(
-        `${req.transactionID} User already exists, so throwing error`,
+        `${req.transactionID} User does not exist, so throwing error`,
       );
 
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+      throw new ErrorResponse(constants.EMAIL_OR_PASSWORD_IS_INVALID, 425);
     }
 
     const doesPasswordMatch = await bcrypt.compare(
@@ -147,6 +148,8 @@ export const login = asyncHandler(async (req, res) => {
       createSuccessResponse(req, res, {
         message: `User with id ${existingUser._id} logged in successfully`,
         boards: existingUser.boards,
+        lastVisitedBoard: existingUser.lastVisitedBoard,
+        isAccountVerified: existingUser.isAccountVerified,
       }),
     );
   } catch (error) {
@@ -181,7 +184,7 @@ export const getUserDetails = asyncHandler(async (req, res) => {
         `${req.transactionID} User doesn't exist, so throwing an error`,
       );
 
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(
@@ -192,6 +195,8 @@ export const getUserDetails = asyncHandler(async (req, res) => {
       createSuccessResponse(req, res, {
         message: `User Details with id ${existingUser._id} logged in successfully`,
         boards: existingUser.boards,
+        lastVisitedBoard: existingUser.lastVisitedBoard,
+        isAccountVerified: existingUser.isAccountVerified,
       }),
     );
   } catch (error) {
@@ -238,7 +243,7 @@ export const removeUser = asyncHandler(async (req, res) => {
         `${req.transactionID} User with ID ${req.params.userId} not found, throwing an error`,
       );
 
-      throw new ErrorResponse(constants.USER_DOES_NOT_EXIST, 424);
+      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     const boardIds = removeUser.boards.map((board) => board._id);
@@ -278,3 +283,92 @@ export const removeUser = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+/**
+ * Logout controller.
+ *
+ * Clears the authentication token cookie from the client and returns
+ * a success response indicating that the user has been logged out.
+ *
+ * @function logout
+ * @async
+ * @param {import('express').Request} req - Express request object.
+ *   Contains the transaction ID used for logging.
+ * @param {import('express').Response} res - Express response object.
+ *   Used to clear cookies and send the response.
+ * @returns {Promise<import('express').Response>} A success response with a logout message.
+ *
+ * @throws {Error} If an unexpected error occurs during logout.
+ */
+
+export const logout = asyncHandler(async (req, res) => {
+  try {
+    logger.debug(`${req.transactionID} Inside logout controller`);
+
+    res.clearCookie("token");
+    return res.send(
+      createSuccessResponse(req, res, {
+        message: `Logged out successfully`,
+      }),
+    );
+  } catch (error) {
+    throw error;
+  }
+});
+
+/**
+ * Update the logged-in user's last visited board.
+ *
+ * @async
+ * @function updateUser
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response object.
+ * @returns {Promise<void>} Sends a success response with a confirmation message.
+ *
+ * @throws {ErrorResponse} Throws an error if the user is not found or
+ * if any unexpected error occurs during the update process.
+ *
+ * @description
+ * This controller updates the `lastVisitedBoard` field for the currently
+ * authenticated user using the board ID provided in the request body.
+ * The board ID is first mapped and validated as an ObjectId.
+ * On success, a standardized success response is returned.
+ */
+export const updateLastVisitedBoardController = asyncHandler(
+  async (req, res) => {
+    try {
+      logger.debug(`${req.transactionID} Inside updateUser controller`);
+
+      const boardId = await objectIdRequestMapper(
+        req.body.boardId,
+        req.transactionID,
+      );
+
+      const board = await Board.findById(boardId);
+
+      if (!board) {
+        throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
+      }
+
+      const user = await User.findByIdAndUpdate(
+        res.locals.userId,
+        {
+          lastVisitedBoard: boardId,
+        },
+        { new: true },
+      );
+
+      if (!user) {
+        throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
+      }
+
+      return res.send(
+        createSuccessResponse(req, res, {
+          message: `Last Visited Board updated to ${boardId} successfully`,
+        }),
+      );
+    } catch (error) {
+      throw error;
+    }
+  },
+);

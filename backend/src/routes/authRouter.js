@@ -4,6 +4,8 @@ import {
   signup,
   removeUser,
   getUserDetails,
+  logout,
+  updateLastVisitedBoardController,
 } from "../controllers/authController.js";
 import { authMiddleware } from "../middlewares/auth.js";
 import startTransaction from "../middlewares/startTransaction.js";
@@ -22,5 +24,14 @@ router.get(
 );
 
 router.post("/remove/user/:userId", startTransaction, removeUser);
+
+router.post("/logout", startTransaction, authMiddleware, logout);
+
+router.post(
+  "/update/user",
+  startTransaction,
+  authMiddleware,
+  updateLastVisitedBoardController,
+);
 
 export default router;

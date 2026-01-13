@@ -60,7 +60,7 @@ describe("Integration testcases for board controller", function () {
         assert.exists(response.body.error);
         assert.notExists(response.body.error.name);
         assert.equal(response.body.error.code, 424);
-        assert.equal(response.body.error.message, "User doesn't exist");
+        assert.equal(response.body.error.message, "Something went wrong");
       });
     });
 
@@ -183,7 +183,7 @@ describe("Integration testcases for board controller", function () {
         assert.equal(response.body.success, false);
         assert.isNotEmpty(response.body.error);
         assert.equal(response.body.error.code, 424);
-        assert.equal(response.body.error.message, "User doesn't exist");
+        assert.equal(response.body.error.message, "Something went wrong");
         assert.notExists(response.body.error.name);
       });
 
@@ -382,7 +382,7 @@ describe("Integration testcases for board controller", function () {
         assert.exists(response.body.error);
         assert.notExists(response.body.error.name);
         assert.equal(response.body.error.code, 424);
-        assert.equal(response.body.error.message, "User doesn't exist");
+        assert.equal(response.body.error.message, "Something went wrong");
       });
 
       it("should fail to update a board when the boardId passed is not a valid ObjectID", async () => {

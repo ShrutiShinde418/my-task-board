@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
     email: String,
     password: String,
     boards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Board" }],
+    lastVisitedBoard: { type: mongoose.Schema.Types.ObjectId, ref: "Board" },
     isAccountVerified: {
       type: Boolean,
       default: false,

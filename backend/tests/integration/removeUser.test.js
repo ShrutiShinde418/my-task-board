@@ -27,7 +27,7 @@ describe("Integration testcases for removeUser controller", () => {
       assert.equal(response.body.success, false);
       assert.isNotEmpty(response.body.error);
       assert.equal(response.body.error.code, 424);
-      assert.equal(response.body.error.message, "User doesn't exist");
+      assert.equal(response.body.error.message, "Something went wrong");
       assert.notExists(response.body.error.name);
     });
   });

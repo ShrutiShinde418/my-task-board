@@ -131,7 +131,7 @@ describe("Integration testcases for tasks controller", function () {
         assert.exists(response.body.error);
         assert.notExists(response.body.error.name);
         assert.equal(response.body.error.code, 424);
-        assert.equal(response.body.error.message, "User doesn't exist");
+        assert.equal(response.body.error.message, "Something went wrong");
       });
 
       it("should fail to create a task when the task name has less than 5 characters", async () => {
@@ -614,7 +614,7 @@ describe("Integration testcases for tasks controller", function () {
         assert.exists(response.body.error);
         assert.notExists(response.body.error.name);
         assert.equal(response.body.error.code, 424);
-        assert.equal(response.body.error.message, "User doesn't exist");
+        assert.equal(response.body.error.message, "Something went wrong");
       });
 
       afterAll(async () => {
@@ -746,7 +746,7 @@ describe("Integration testcases for tasks controller", function () {
         assert.exists(response.body.error);
         assert.notExists(response.body.error.name);
         assert.equal(response.body.error.code, 424);
-        assert.equal(response.body.error.message, "User doesn't exist");
+        assert.equal(response.body.error.message, "Something went wrong");
       });
 
       it("should fail to delete a task when an invalid ObjectID is passed as the query params", async () => {
