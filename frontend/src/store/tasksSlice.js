@@ -41,6 +41,8 @@ const tasksSlice = createSlice({
           acc[status].push(task);
           return acc;
         }, {});
+      } else {
+        state.taskStore = initialTaskStoreState;
       }
     },
     setTaskToUpdate: (state, action) => {

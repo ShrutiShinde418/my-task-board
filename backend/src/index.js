@@ -13,6 +13,8 @@ import boardRouter from "./routes/boardRouter.js";
 import taskRouter from "./routes/taskRouter.js";
 import authRouter from "./routes/authRouter.js";
 import setupLogger from "./utils/logger.js";
+import ErrorResponse from "./utils/errorResponse.js";
+import constants from "./utils/constants.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,10 +31,13 @@ global.logger = setupLogger(
 );
 
 const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  limit: 20,
+  windowMs: 15 * 60 * 1000,
+  limit: 50,
   legacyHeaders: false,
   ipv6Subnet: 52,
+  handler: () => {
+    throw new ErrorResponse(constants.TOO_MANY_REQUESTS, 429);
+  },
 });
 
 const app = express();

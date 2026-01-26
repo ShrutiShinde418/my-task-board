@@ -4,18 +4,16 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { LuMenu } from "react-icons/lu";
 import { useUser } from "../hooks/useUser.js";
 import { useMutationHandler } from "../hooks/useMutationHandler.js";
-import { handleMutation } from "../utils/http.js";
+import { getUserDetails, handleMutation } from "../utils/http.js";
 import { POST } from "../utils/helpers.js";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useTaskSlice } from "../hooks/useTaskSlice.js";
+import { useFetch } from "../hooks/useFetch.js";
+import BoardItem from "./BoardItem.jsx";
 
 const MultiBoardTaskManager = () => {
-  const {
-    user: userData,
-    activeBoard: selectedBoard,
-    setActiveBoardHandler,
-  } = useUser();
+  const { user: userData, setActiveBoardHandler } = useUser();
   const client = useQueryClient();
   const { updateTaskStoreHandler } = useTaskSlice();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -51,13 +49,21 @@ const MultiBoardTaskManager = () => {
     },
   );
 
+  const { data: userInfo } = useFetch(
+    ["getUserDetails"],
+    () => getUserDetails(),
+    {
+      retry: false,
+    },
+  );
+
   const updateActiveBoardHandler = (boardId) => {
     updateBoardMutation({ boardId });
-    const newActiveBoard = userData?.boards?.find(
+    const newActiveBoard = userInfo?.data?.boards?.find(
       (board) => board._id === boardId,
     );
     setActiveBoardHandler(newActiveBoard);
-    updateTaskStoreHandler(newActiveBoard?.tasks);
+    updateTaskStoreHandler([]);
     setSidebarOpen(false);
   };
 
@@ -129,29 +135,13 @@ const MultiBoardTaskManager = () => {
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-3">
               Your Boards
             </p>
-            {userData?.boards.map((board) => {
+            {userData?.boards?.map((board) => {
               return (
-                <button
+                <BoardItem
+                  board={board}
                   key={board._id}
-                  onClick={() => {
-                    updateActiveBoardHandler(board._id);
-                  }}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
-                    selectedBoard?._id === board._id
-                      ? "border-2"
-                      : "hover:bg-gray-50"
-                  }`}
-                >
-                  <span
-                    className={`font-medium ${
-                      selectedBoard?._id === board._id
-                        ? "text-gray-900"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {board.name}
-                  </span>
-                </button>
+                  setSidebarOpen={setSidebarOpen}
+                />
               );
             })}
           </div>

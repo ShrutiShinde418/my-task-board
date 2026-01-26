@@ -293,6 +293,31 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
       `${req.transactionID} Deleting all tasks present in the board with ID ${deletedBoard._id}`,
     );
 
+    if (req.params.boardId === user.lastVisitedBoard.toString()) {
+      logger.debug(
+        `${req.transactionID} The board to be deleted is the last board being visited, so setting the last visited board to another of the user's boards`,
+      );
+
+      const availableBoards = user.boards.filter(
+        (boardId) => boardId.toString() !== req.params.boardId,
+      );
+
+      if (availableBoards.length > 0) {
+        logger.debug(
+          `${req.transactionID} Boards are available, setting the user's last visited board to another of the user's boards`,
+        );
+        user.lastVisitedBoard = availableBoards[0];
+      } else {
+        logger.error(
+          `${req.transactionID} No other boards are available, setting the user's last visited board to an empty string`,
+        );
+
+        user.lastVisitedBoard = "";
+      }
+    }
+
+    await user.save();
+
     const deleteTasks = await Task.deleteMany({
       _id: { $in: deletedBoard.tasks },
     });
