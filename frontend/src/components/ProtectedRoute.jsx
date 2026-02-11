@@ -42,13 +42,17 @@ const ProtectedRoute = () => {
 
   useEffect(() => {
     if (userData?.status === 200) {
-      if (userData?.data?.lastVisitedBoard) {
+      if (userData?.data?.boards?.length === 0) {
         createBoardMutation();
       }
 
-      const activeBoard = userData?.data?.boards?.find(
+      let activeBoard = userData?.data?.boards?.find(
         (board) => board._id === userData?.data?.lastVisitedBoard,
       );
+
+      if (!activeBoard && userData?.data?.boards?.length > 0) {
+        activeBoard = userData.data.boards[0];
+      }
       setActiveBoardHandler(activeBoard);
       setUserState(userData.data);
       updateTaskStoreHandler(activeBoard?.tasks);
