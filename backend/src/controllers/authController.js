@@ -9,6 +9,7 @@ import { authRequestMapper } from "../models/authRequestMapper.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
 import Task from "../models/Task.js";
 import Board from "../models/Board.js";
+import { encryptData } from "../utils/helperMethods.js";
 
 /**
  * Controller to sign up a user
@@ -133,12 +134,17 @@ export const login = asyncHandler(async (req, res) => {
       .setIssuer(process.env.ISSUER)
       .sign(new TextEncoder().encode(process.env.JWT_SECRET));
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "prod",
-      sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
-      maxAge: Number(process.env.TOKEN_EXPIRY[0]) * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(
+      "__Host-session_id",
+      await encryptData(token, process.env.AES_KEY),
+      {
+        httpOnly: true,
+        path: "/",
+        secure: process.env.NODE_ENV === "prod",
+        sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
+        maxAge: Number(process.env.TOKEN_EXPIRY[0]) * 24 * 60 * 60 * 1000,
+      },
+    );
 
     logger.debug(
       `${req.transactionID} User with id ${existingUser._id} logged in successfully`,

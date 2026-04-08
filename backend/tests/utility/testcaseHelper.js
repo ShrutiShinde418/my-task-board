@@ -41,7 +41,7 @@ export class TestcaseHelper {
       `User with id ${userId} logged in successfully`,
     );
     assert.isNotEmpty(loginResponse.headers["set-cookie"]);
-    assert.include(loginResponse.headers["set-cookie"][0], "token");
+    assert.include(loginResponse.headers["set-cookie"][0], "__Host-session_id");
     assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");
     assert.include(loginResponse.headers["set-cookie"][0], "SameSite=Strict");
 
@@ -70,7 +70,7 @@ export class TestcaseHelper {
     const createBoardResponse = await request(app)
       .post("/api/boards")
       .set("Content-Type", "application/json")
-      .set("Cookie", `token=${token}`);
+      .set("Cookie", `__Host-session_id=${token}`);
 
     assert.equal(createBoardResponse.status, 200);
     assert.isNotEmpty(createBoardResponse.body);
@@ -97,7 +97,7 @@ export class TestcaseHelper {
     const createTaskResponse = await request(app)
       .post("/api/tasks/create")
       .set("Content-Type", "application/json")
-      .set("Cookie", `token=${token}`)
+      .set("Cookie", `__Host-session_id=${token}`)
       .send(requestBody);
 
     assert.equal(createTaskResponse.status, 200);
@@ -130,7 +130,7 @@ export class TestcaseHelper {
       const createTaskResponse = await request(app)
         .post("/api/tasks/create")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${token}`)
+        .set("Cookie", `__Host-session_id=${token}`)
         .send(requestBody);
 
       assert.equal(createTaskResponse.status, 200);
@@ -163,7 +163,7 @@ export class TestcaseHelper {
       const createBoardResponse = await request(app)
         .post("/api/boards")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${userDetails.token}`);
+        .set("Cookie", `__Host-session_id=${userDetails.token}`);
 
       assert.equal(createBoardResponse.status, 200);
       assert.isNotEmpty(createBoardResponse.body);

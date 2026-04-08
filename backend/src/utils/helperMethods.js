@@ -1,6 +1,57 @@
+import crypto from "node:crypto";
+import { promisify } from "node:util";
 import { ZodError } from "zod";
 import ErrorResponse from "./errorResponse.js";
 import constants from "./constants.js";
+
+const pbkdf2 = promisify(crypto.pbkdf2);
+
+/**
+ * Derives a 256-bit AES key from a password and salt using PBKDF2.
+ */
+const deriveKey = async (password, salt) => {
+  return await pbkdf2(password, salt, 10000, 32, "sha256");
+};
+
+/**
+ * Encrypts data using AES-256-GCM.
+ */
+export const encryptData = async function (data, password) {
+  const salt = crypto.randomBytes(16);
+  const iv = crypto.randomBytes(12);
+  const key = await deriveKey(password, salt);
+
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const ciphertext = Buffer.concat([
+    cipher.update(data, "utf8"),
+    cipher.final(),
+  ]);
+  const authTag = cipher.getAuthTag();
+
+  return Buffer.concat([salt, iv, authTag, ciphertext]).toString("base64");
+};
+
+/**
+ * Decrypts data using AES-256-GCM.
+ */
+export const decryptData = async function (encryptedString, password) {
+  const combined = Buffer.from(encryptedString, "base64");
+
+  const salt = combined.subarray(0, 16);
+  const iv = combined.subarray(16, 28);
+  const authTag = combined.subarray(28, 44);
+  const ciphertext = combined.subarray(44);
+
+  const key = await deriveKey(password, salt);
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+  decipher.setAuthTag(authTag);
+
+  const decrypted = Buffer.concat([
+    decipher.update(ciphertext),
+    decipher.final(),
+  ]);
+  return decrypted.toString("utf8");
+};
 
 /**
  * Handle and normalize validation errors.

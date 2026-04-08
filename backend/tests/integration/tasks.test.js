@@ -19,7 +19,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -44,7 +44,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody + "fsdklsdcd");
 
         assert.equal(response.status, 400);
@@ -92,7 +92,7 @@ describe("Integration testcases for tasks controller", function () {
           .set("Content-Type", "application/json")
           .set(
             "Cookie",
-            `token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY5MjZmZDdiOTZjNzc3NjQwYTc3Y2JlYSIsImlhdCI6MTc2NDE2Mjk3NCwiZXhwIjoxNzY0MzM1Nzc0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUxNzMifQ.Ec2YGBFTiTxtaE6r_QI7ZGO8yh-4mWUAT6jDexEqKeI`,
+            `__Host-session_id=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
           )
           .send(requestBody);
 
@@ -122,7 +122,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${newUser.token}`)
+          .set("Cookie", `__Host-session_id=${newUser.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -144,7 +144,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -169,7 +169,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -193,7 +193,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -218,7 +218,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -243,7 +243,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -266,7 +266,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -291,7 +291,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -317,7 +317,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -358,7 +358,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -388,7 +388,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -418,7 +418,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .post("/api/tasks/create")
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -456,7 +456,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -479,7 +479,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -502,7 +502,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -527,7 +527,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody + "fsdklsdcd");
 
         assert.equal(response.status, 400);
@@ -575,7 +575,7 @@ describe("Integration testcases for tasks controller", function () {
           .set("Content-Type", "application/json")
           .set(
             "Cookie",
-            `token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY5MjZmZDdiOTZjNzc3NjQwYTc3Y2JlYSIsImlhdCI6MTc2NDE2Mjk3NCwiZXhwIjoxNzY0MzM1Nzc0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUxNzMifQ.Ec2YGBFTiTxtaE6r_QI7ZGO8yh-4mWUAT6jDexEqKeI`,
+            `__Host-session_id=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
           )
           .send(requestBody);
 
@@ -605,7 +605,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${newUser.token}`)
+          .set("Cookie", `__Host-session_id=${newUser.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -642,7 +642,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -662,7 +662,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -681,7 +681,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -700,7 +700,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .put(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`)
+          .set("Cookie", `__Host-session_id=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -738,7 +738,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .delete(`/api/tasks/6941a3fef6195895de78985b`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${newUser.token}`);
+          .set("Cookie", `__Host-session_id=${newUser.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotNull(response.body);
@@ -753,7 +753,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .delete(`/api/tasks/6941a3fef6195895de78985bsdfjsdkfdkmfdd`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`);
+          .set("Cookie", `__Host-session_id=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotNull(response.body);
@@ -768,7 +768,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .delete(`/api/tasks/6941a3fef6195895de78985b`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`);
+          .set("Cookie", `__Host-session_id=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotNull(response.body);
@@ -803,7 +803,7 @@ describe("Integration testcases for tasks controller", function () {
         const response = await request(app)
           .delete(`/api/tasks/${result.task._id}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `token=${result.token}`);
+          .set("Cookie", `__Host-session_id=${result.token}`);
 
         assert.equal(response.status, 200);
         assert.isNotNull(response.body);

@@ -325,7 +325,10 @@ describe("Integration Tests for login controller", () => {
       assert.isArray(loginResponse.body.boards);
       assert.lengthOf(loginResponse.body.boards, 1);
       assert.isNotEmpty(loginResponse.headers["set-cookie"]);
-      assert.include(loginResponse.headers["set-cookie"][0], "token");
+      assert.include(
+        loginResponse.headers["set-cookie"][0],
+        "__Host-session_id",
+      );
       assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");
       assert.include(loginResponse.headers["set-cookie"][0], "SameSite=Strict");
 

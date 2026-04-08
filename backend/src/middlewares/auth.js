@@ -2,6 +2,7 @@ import { jwtVerify } from "jose";
 import { createErrorResponse } from "../models/responseMapper.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import Constants from "../utils/constants.js";
+import { decryptData } from "../utils/helperMethods.js";
 
 /**
  * Authentication middleware to verify JWT from cookies.
@@ -25,9 +26,7 @@ export const authMiddleware = async (req, res, next) => {
   try {
     logger.debug(`${req.transactionID} Inside authMiddleware`);
 
-    const { token } = req.cookies;
-
-    if (!token) {
+    if (!req.cookies["__Host-session_id"]) {
       logger.error(
         `${req.transactionID} Token not passed as a cookie, throwing error`,
       );
@@ -43,7 +42,7 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     const { payload } = await jwtVerify(
-      token,
+      await decryptData(req.cookies["__Host-session_id"], process.env.AES_KEY),
       new TextEncoder().encode(process.env.JWT_SECRET),
       {
         issuer: process.env.ISSUER,

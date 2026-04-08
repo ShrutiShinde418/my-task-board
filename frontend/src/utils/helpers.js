@@ -130,7 +130,7 @@ export const encryptData = async function (data, password) {
     {
       name: "AES-GCM",
       iv,
-      tagLength: 128, // 128-bit tag length
+      tagLength: 128,
     },
     key,
     encodedData,

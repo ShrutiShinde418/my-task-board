@@ -1,6 +1,6 @@
 import request from "supertest";
 import app from "../../src/index.js";
-import { objectIdRegex, TestcaseHelper } from "../utility/testcaseHelper.js";
+import { TestcaseHelper } from "../utility/testcaseHelper.js";
 
 const helper = new TestcaseHelper();
 let result;
@@ -17,7 +17,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
       const response = await request(app)
         .post("/api/update/user")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${result.token}`)
+        .set("Cookie", `__Host-session_id=${result.token}`)
         .send(requestBody);
 
       assert.equal(response.status, 400);
@@ -40,7 +40,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
       const response = await request(app)
         .post("/api/update/user")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${result.token}`)
+        .set("Cookie", `__Host-session_id=${result.token}`)
         .send(requestBody + "sdfjdkjfd");
 
       assert.equal(response.status, 400);
@@ -84,7 +84,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
         .set("Content-Type", "application/json")
         .set(
           "Cookie",
-          `token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY5MjZmZDdiOTZjNzc3NjQwYTc3Y2JlYSIsImlhdCI6MTc2NDE2Mjk3NCwiZXhwIjoxNzY0MzM1Nzc0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUxNzMifQ.Ec2YGBFTiTxtaE6r_QI7ZGO8yh-4mWUAT6jDexEqKeI`,
+          `__Host-session_id=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
         )
         .send(requestBody);
 
@@ -108,7 +108,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
       const response = await request(app)
         .post("/api/update/user")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${result.token}`)
+        .set("Cookie", `__Host-session_id=${result.token}`)
         .send(requestBody);
 
       assert.equal(response.status, 400);
@@ -131,7 +131,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
       const response = await request(app)
         .post("/api/update/user")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${result.token}`)
+        .set("Cookie", `__Host-session_id=${result.token}`)
         .send(requestBody);
 
       assert.equal(response.status, 400);
@@ -154,7 +154,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
       const response = await request(app)
         .post("/api/update/user")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${result.token}`)
+        .set("Cookie", `__Host-session_id=${result.token}`)
         .send(requestBody);
 
       assert.equal(response.status, 400);
@@ -174,7 +174,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
       const response = await request(app)
         .post("/api/update/user")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${result.token}`)
+        .set("Cookie", `__Host-session_id=${result.token}`)
         .send(requestBody);
 
       assert.equal(response.status, 400);
@@ -209,7 +209,7 @@ describe("Integration testcases for updateLastVisitedBoardController", function 
       const response = await request(app)
         .post("/api/update/user")
         .set("Content-Type", "application/json")
-        .set("Cookie", `token=${result.token}`)
+        .set("Cookie", `__Host-session_id=${result.token}`)
         .send(requestBody);
 
       assert.equal(response.status, 200);
