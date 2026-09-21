@@ -41,9 +41,9 @@ export class TestcaseHelper {
       `User with id ${userId} logged in successfully`,
     );
     assert.isNotEmpty(loginResponse.headers["set-cookie"]);
-    assert.include(loginResponse.headers["set-cookie"][0], "__Host-session_id");
+    assert.include(loginResponse.headers["set-cookie"][0], "auth_session");
     assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");
-    assert.include(loginResponse.headers["set-cookie"][0], "SameSite=Strict");
+    assert.include(loginResponse.headers["set-cookie"][0], "SameSite=None");
 
     return {
       email: requestBody.email,
@@ -70,7 +70,7 @@ export class TestcaseHelper {
     const createBoardResponse = await request(app)
       .post("/api/boards")
       .set("Content-Type", "application/json")
-      .set("Cookie", `__Host-session_id=${token}`);
+      .set("Cookie", `auth_session=${token}`);
 
     assert.equal(createBoardResponse.status, 200);
     assert.isNotEmpty(createBoardResponse.body);
@@ -97,7 +97,7 @@ export class TestcaseHelper {
     const createTaskResponse = await request(app)
       .post("/api/tasks/create")
       .set("Content-Type", "application/json")
-      .set("Cookie", `__Host-session_id=${token}`)
+      .set("Cookie", `auth_session=${token}`)
       .send(requestBody);
 
     assert.equal(createTaskResponse.status, 200);
@@ -130,7 +130,7 @@ export class TestcaseHelper {
       const createTaskResponse = await request(app)
         .post("/api/tasks/create")
         .set("Content-Type", "application/json")
-        .set("Cookie", `__Host-session_id=${token}`)
+        .set("Cookie", `auth_session=${token}`)
         .send(requestBody);
 
       assert.equal(createTaskResponse.status, 200);
@@ -163,7 +163,7 @@ export class TestcaseHelper {
       const createBoardResponse = await request(app)
         .post("/api/boards")
         .set("Content-Type", "application/json")
-        .set("Cookie", `__Host-session_id=${userDetails.token}`);
+        .set("Cookie", `auth_session=${userDetails.token}`);
 
       assert.equal(createBoardResponse.status, 200);
       assert.isNotEmpty(createBoardResponse.body);

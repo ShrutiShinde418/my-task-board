@@ -1,4 +1,5 @@
 import request from "supertest";
+import { describe, it, assert } from "vitest";
 import app from "../../src/index.js";
 
 describe("Integration testcases for removeUser controller", () => {

@@ -1,4 +1,13 @@
 import request from "supertest";
+import {
+  beforeAll,
+  describe,
+  it,
+  assert,
+  afterAll,
+  afterEach,
+  beforeEach,
+} from "vitest";
 import app from "../../src/index.js";
 import { objectIdRegex, TestcaseHelper } from "../utility/testcaseHelper.js";
 
@@ -33,7 +42,7 @@ describe("Integration testcases for board controller", function () {
           .set("Content-Type", "application/json")
           .set(
             "Cookie",
-            "__Host-session_id=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=",
+            "auth_session=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=",
           );
 
         assert.equal(response.status, 401);
@@ -52,7 +61,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .post("/api/boards")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotNull(response.body);
@@ -73,7 +82,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .post("/api/boards")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 200);
         assert.isNotEmpty(response.body);
@@ -85,7 +94,7 @@ describe("Integration testcases for board controller", function () {
         const getBoardResponse = await request(app)
           .get(`/api/boards/${response.body.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(getBoardResponse.status, 200);
         assert.isNotEmpty(getBoardResponse.body);
@@ -118,7 +127,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .get("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotEmpty(response.body);
@@ -136,7 +145,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .get("/api/boards/FF125DF6E977404A9E8C600CDAFEFF5")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotEmpty(response.body);
@@ -153,7 +162,7 @@ describe("Integration testcases for board controller", function () {
           .set("Content-Type", "application/json")
           .set(
             "Cookie",
-            `__Host-session_id=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
+            `auth_session=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
           );
 
         assert.equal(response.status, 401);
@@ -176,7 +185,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .get("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${newUser.token}`);
+          .set("Cookie", `auth_session=${newUser.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotEmpty(response.body);
@@ -201,7 +210,7 @@ describe("Integration testcases for board controller", function () {
         const createBoardResponse = await request(app)
           .post("/api/boards")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(createBoardResponse.status, 200);
         assert.isNotEmpty(createBoardResponse.body);
@@ -218,7 +227,7 @@ describe("Integration testcases for board controller", function () {
         const getBoardResponse = await request(app)
           .get(`/api/boards/${createBoardResponse.body.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(getBoardResponse.status, 200);
         assert.isNotEmpty(getBoardResponse.body);
@@ -243,7 +252,7 @@ describe("Integration testcases for board controller", function () {
         const createBoardResponse = await request(app)
           .post("/api/boards")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(createBoardResponse.status, 200);
         assert.isNotEmpty(createBoardResponse.body);
@@ -261,7 +270,7 @@ describe("Integration testcases for board controller", function () {
         const getBoardResponse = await request(app)
           .get(`/api/boards/${createBoardResponse.body.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(getBoardResponse.status, 200);
         assert.isNotEmpty(getBoardResponse.body);
@@ -302,7 +311,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody + "fsdfjsdkf");
 
         assert.equal(response.status, 400);
@@ -325,7 +334,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -346,7 +355,7 @@ describe("Integration testcases for board controller", function () {
           .set("Content-Type", "application/json")
           .set(
             "Cookie",
-            `__Host-session_id=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
+            `auth_session=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
           );
 
         assert.equal(response.status, 401);
@@ -373,7 +382,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${newUser.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${newUser.token}`)
+          .set("Cookie", `auth_session=${newUser.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -389,7 +398,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put("/api/boards/FF125DF6E977404A9E8C600CDAFEFF5")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotEmpty(response.body);
@@ -408,7 +417,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -432,7 +441,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -457,7 +466,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -478,7 +487,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -502,7 +511,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -526,7 +535,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 400);
@@ -552,7 +561,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .put(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`)
+          .set("Cookie", `auth_session=${result.token}`)
           .send(requestBody);
 
         assert.equal(response.status, 200);
@@ -578,7 +587,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .delete("/api/boards/6566d5b0c9a0b1c2d3e4f5a6")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotEmpty(response.body);
@@ -598,7 +607,7 @@ describe("Integration testcases for board controller", function () {
           .set("Content-Type", "application/json")
           .set(
             "Cookie",
-            `__Host-session_id=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
+            `auth_session=ciaGoZ+FjeSzjiqmk1no0FcSU/a3q4XlI3p9P4zU/OM+7Eg7yKzDMGkCueyl9qIq4RpYtdSeeH1F5fCaGwtbEqAdaR1LJ/RPdT/sd/XK+Xn1GrBw0wHjN9w/Plhg/3wdUweTom9yYwr9d98lWx0ydVZduTZefgw6w0q26GTryh7rN/e5xu2eGk6CKQpTGs/wO08wc3SycXZL5YByHf6QskeYuu26zANv/meFiwV0MQrmTApsaGgc+VUXVfEwxLgY6iB10jv007HuRtfCH9EShjATdT7ElB84/lzglU73vZSyn1WjfXTj194NoWk7V4w=`,
           );
 
         assert.equal(response.status, 401);
@@ -617,7 +626,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .delete("/api/boards/FF125DF6E977404A9E8C600CDAFEFF5")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 400);
         assert.isNotEmpty(response.body);
@@ -641,7 +650,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .delete(`/api/boards/${result.boardId}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 200);
         assert.isNotEmpty(response.body);
@@ -661,7 +670,7 @@ describe("Integration testcases for board controller", function () {
         const response = await request(app)
           .delete(`/api/boards/${result.boardIdsArray[1]}`)
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(response.status, 200);
         assert.isNotEmpty(response.body);
@@ -675,7 +684,7 @@ describe("Integration testcases for board controller", function () {
         const userDetailsResponse = await request(app)
           .get("/api/get/user/details")
           .set("Content-Type", "application/json")
-          .set("Cookie", `__Host-session_id=${result.token}`);
+          .set("Cookie", `auth_session=${result.token}`);
 
         assert.equal(userDetailsResponse.status, 200);
         assert.isNotEmpty(userDetailsResponse.body);

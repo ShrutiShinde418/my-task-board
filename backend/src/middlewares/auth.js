@@ -26,7 +26,10 @@ export const authMiddleware = async (req, res, next) => {
   try {
     logger.debug(`${req.transactionID} Inside authMiddleware`);
 
-    if (!req.cookies["__Host-session_id"]) {
+    const cookieName =
+      process.env.NODE_ENV === "prod" ? "__Host-session_id" : "auth_session";
+
+    if (!req.cookies[cookieName]) {
       logger.error(
         `${req.transactionID} Token not passed as a cookie, throwing error`,
       );
@@ -42,7 +45,7 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     const { payload } = await jwtVerify(
-      await decryptData(req.cookies["__Host-session_id"], process.env.AES_KEY),
+      await decryptData(req.cookies[cookieName], process.env.AES_KEY),
       new TextEncoder().encode(process.env.JWT_SECRET),
       {
         issuer: process.env.ISSUER,

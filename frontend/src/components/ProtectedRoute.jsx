@@ -15,9 +15,9 @@ const ProtectedRoute = () => {
 
   const { data: userData, error } = useFetch(
     ["getUserDetails"],
-    () => getUserDetails(),
+    getUserDetails,
     {
-      retry: false,
+      retry: 1,
     },
   );
 

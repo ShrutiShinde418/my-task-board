@@ -135,13 +135,14 @@ export const login = asyncHandler(async (req, res) => {
       .sign(new TextEncoder().encode(process.env.JWT_SECRET));
 
     res.cookie(
-      "__Host-session_id",
+      process.env.NODE_ENV === "prod" ? "__Host-session_id" : "auth_session",
       await encryptData(token, process.env.AES_KEY),
       {
         httpOnly: true,
         path: "/",
         secure: process.env.NODE_ENV === "prod",
-        sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
+        // sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
+        sameSite: "none",
         maxAge: Number(process.env.TOKEN_EXPIRY[0]) * 24 * 60 * 60 * 1000,
       },
     );

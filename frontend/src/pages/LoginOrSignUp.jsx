@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useId, useRef } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useFetch } from "../hooks/useFetch.js";
-import { signup, login, getUserDetails } from "../utils/http.js";
+import { signup, login } from "../utils/http.js";
 
 const LoginOrSignUp = () => {
   const navigate = useNavigate();
@@ -80,14 +80,6 @@ const LoginOrSignUp = () => {
       setPassword("");
     }
   }, [id, loginData, loginError, navigate, signupData?.status, signupError]);
-
-  const { data } = useFetch(["getUserDetails"], () => getUserDetails(), {
-    retry: false,
-  });
-
-  if (data?.status === 200) {
-    return <Navigate to="/home" replace />;
-  }
 
   return (
     <div className="font-custom min-h-screen flex items-center justify-center p-4">

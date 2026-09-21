@@ -51,7 +51,7 @@ app.use(
   }),
 );
 app.use(helmet());
-app.use(limiter);
+// app.use(limiter);
 
 app.use("/api", boardRouter);
 app.use("/api", taskRouter);

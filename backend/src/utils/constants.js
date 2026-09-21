@@ -11,4 +11,5 @@ export default Object.freeze({
   TOKEN_EXPIRED: "The authentication token has expired",
   SOMETHING_WENT_WRONG: "Something went wrong",
   TOO_MANY_REQUESTS: "Too many requests, please try again later",
+  NOT_AUTHORIZED: "Not authorized to perform this operation",
 });

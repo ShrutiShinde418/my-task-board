@@ -4,7 +4,7 @@ import Task from "../models/Task.js";
 import Board from "../models/Board.js";
 import User from "../models/User.js";
 import constants from "../utils/constants.js";
-import ErrorResponse from "../utils/ErrorResponse.js";
+import ErrorResponse from "../utils/errorResponse.js";
 import { createSuccessResponse } from "../models/responseMapper.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
@@ -271,7 +271,10 @@ export const deleteTaskController = asyncHandler(async (req, res) => {
       `${req.transactionID} Verifying is the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.userId).populate({
+      path: "boards",
+      populate: { path: "tasks" },
+    });
 
     if (!user) {
       logger.error(

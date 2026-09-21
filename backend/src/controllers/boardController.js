@@ -271,6 +271,16 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
 
     await objectIdRequestMapper(req.params.boardId, req.transactionID);
 
+    const doesBoardBelongToUser = user.boards.includes(req.params.boardId);
+
+    if (!doesBoardBelongToUser) {
+      logger.error(
+        `${req.transactionID} The boardID passed in the params does not belong to the user, so throwing an error`,
+      );
+
+      throw new ErrorResponse(constants.NOT_AUTHORIZED, 400);
+    }
+
     const deletedBoard = await Board.findByIdAndDelete(req.params.boardId);
 
     if (!deletedBoard) {

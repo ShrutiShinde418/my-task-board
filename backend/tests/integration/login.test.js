@@ -1,4 +1,5 @@
 import request from "supertest";
+import { describe, it, assert } from "vitest";
 import app from "../../src/index.js";
 
 describe("Integration Tests for login controller", () => {
@@ -325,12 +326,9 @@ describe("Integration Tests for login controller", () => {
       assert.isArray(loginResponse.body.boards);
       assert.lengthOf(loginResponse.body.boards, 1);
       assert.isNotEmpty(loginResponse.headers["set-cookie"]);
-      assert.include(
-        loginResponse.headers["set-cookie"][0],
-        "__Host-session_id",
-      );
+      assert.include(loginResponse.headers["set-cookie"][0], "auth_session");
       assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");
-      assert.include(loginResponse.headers["set-cookie"][0], "SameSite=Strict");
+      assert.include(loginResponse.headers["set-cookie"][0], "SameSite=None");
 
       const removeUserResponse = await request(app)
         .post(`/api/remove/user/${userId}`)
