@@ -4,6 +4,8 @@ import ErrorResponse from "../utils/errorResponse.js";
 import Constants from "../utils/constants.js";
 import { decryptData } from "../utils/helperMethods.js";
 
+import { getTransactionIdFromAsyncStore } from "./startTransaction.js";
+
 /**
  * Authentication middleware to verify JWT from cookies.
  *
@@ -23,15 +25,17 @@ import { decryptData } from "../utils/helperMethods.js";
  * @throws {Error} When JWT verification fails due to unexpected errors.
  */
 export const authMiddleware = async (req, res, next) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
-    logger.debug(`${req.transactionID} Inside authMiddleware`);
+    logger.debug(`${transactionID} Inside authMiddleware`);
 
     const cookieName =
       process.env.NODE_ENV === "prod" ? "__Host-session_id" : "auth_session";
 
     if (!req.cookies[cookieName]) {
       logger.error(
-        `${req.transactionID} Token not passed as a cookie, throwing error`,
+        `${transactionID} Token not passed as a cookie, throwing error`,
       );
 
       return res.send(
@@ -53,7 +57,7 @@ export const authMiddleware = async (req, res, next) => {
     );
 
     logger.debug(
-      `${req.transactionID} Payload decoded successfully, setting userId in res.locals`,
+      `${transactionID} Payload decoded successfully, setting userId in res.locals`,
     );
 
     res.locals.userId = payload.id;
@@ -61,12 +65,12 @@ export const authMiddleware = async (req, res, next) => {
     next();
   } catch (e) {
     logger.error(
-      `${req.transactionID} Error occurred while verifying JWT :: ${e}, ${JSON.stringify(e)}`,
+      `${transactionID} Error occurred while verifying JWT :: ${e.message}, ${JSON.stringify(e)}`,
     );
 
     if (e.code === "ERR_JWT_EXPIRED") {
       logger.error(
-        `${req.transactionID} The token passed is expired, throwing an error`,
+        `${transactionID} The token passed is expired, throwing an error`,
       );
 
       return res.send(

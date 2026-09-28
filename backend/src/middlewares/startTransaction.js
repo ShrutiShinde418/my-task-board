@@ -1,4 +1,7 @@
 import { v4 } from "uuid";
+import { AsyncLocalStorage } from "node:async_hooks";
+
+const asyncLocalStorage = new AsyncLocalStorage();
 
 /**
  * Middleware to initialize a new transaction for each incoming request.
@@ -17,10 +20,29 @@ import { v4 } from "uuid";
  * @returns {void} Calls `next()` to continue request processing.
  */
 const startTransaction = (req, res, next) => {
-  req.transactionID = v4();
-  req.txnStart = Date.now();
-
-  next();
+  asyncLocalStorage.run(new Map(), () => {
+    const store = asyncLocalStorage.getStore();
+    if (store) {
+      store.set('transactionID', v4());
+      store.set('txnStart', Date.now());
+    }
+    next();
+  });
 };
+
+/**
+ * Get transactionId and txnStart from the async store
+ *
+ * @returns {{transactionId: string, txnStart: number} | undefined}
+ */
+export const getTransactionIdFromAsyncStore = () => {
+  const store = asyncLocalStorage.getStore();
+  return store ? store.get('transactionID') : undefined;
+}
+
+export const getTxnStartFromAsyncStore = () => {
+  const store = asyncLocalStorage.getStore();
+  return store ? store.get('txnStart') : undefined;
+}
 
 export default startTransaction;

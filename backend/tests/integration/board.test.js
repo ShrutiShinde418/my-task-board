@@ -594,10 +594,10 @@ describe("Integration testcases for board controller", function () {
         assert.equal(response.body.success, false);
         assert.isNotEmpty(response.body.error);
         assert.notExists(response.body.error.name);
-        assert.equal(response.body.error.code, 404);
+        assert.equal(response.body.error.code, 400);
         assert.equal(
           response.body.error.message,
-          "The requested resource could not be located",
+          "Not authorized to perform this operation",
         );
       });
 

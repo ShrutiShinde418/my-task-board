@@ -1,3 +1,4 @@
+import { describe, it, vi } from "vitest";
 import { asyncHandler } from "../../src/middlewares/asyncHandler.js";
 
 describe("Unit tests for asyncHandler", () => {

@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import ErrorResponse from "../utils/errorResponse.js";
 import Constants from "../utils/constants.js";
 import { createErrorResponse } from "../models/responseMapper.js";
+import { getTransactionIdFromAsyncStore } from "./startTransaction.js";
+
 
 /**
  * Global error handling middleware.
@@ -22,12 +24,14 @@ import { createErrorResponse } from "../models/responseMapper.js";
  * @returns {import("express").Response} JSON error response formatted by `createErrorResponse`.
  */
 const errorHandler = (err, req, res, next) => {
+  const transactionID = getTransactionIdFromAsyncStore() ? getTransactionIdFromAsyncStore() : uuidv4();
+
   if (err instanceof SyntaxError && "body" in err) {
-    req.transactionID = uuidv4();
-    req.txnStart = Date.now();
+
+    // const txnStart = getTxnStartFromAsyncStore() ? getTxnStartFromAsyncStore() : Date.now();
 
     logger.error(
-      `${req.transactionID} Request body contains invalid JSON, so throwing an error`
+      `${transactionID} Request body contains invalid JSON, so throwing an error`
     );
 
     return res.send(
@@ -46,8 +50,7 @@ const errorHandler = (err, req, res, next) => {
 
   if (err instanceof Error) {
     logger.error(
-      `${
-        req.transactionID
+      `${transactionID
       } Internal Communication Error occurred :: ${err}, ${JSON.stringify(err)}`
     );
 

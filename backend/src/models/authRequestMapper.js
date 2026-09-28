@@ -1,6 +1,8 @@
 import { z } from "zod";
 import constants from "../utils/constants.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
+import { getTransactionIdFromAsyncStore } from "../middlewares/startTransaction.js";
+
 
 /**
  * Request Mapper for signup and login controllers
@@ -10,9 +12,11 @@ import { handleValidationErrors } from "../utils/helperMethods.js";
  * @param {import('express').Request} req - Express Request Object.
  */
 export const authRequestMapper = async (req) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
     logger.debug(
-      `${req.transactionID} Validating the request body with email: ${req.body.email}`,
+      `${transactionID} Validating the request body with email: ${req.body.email}`,
     );
 
     const schema = z.strictObject(
@@ -40,9 +44,9 @@ export const authRequestMapper = async (req) => {
     return await schema.parseAsync(req.body);
   } catch (e) {
     logger.error(
-      `${req.transactionID} Error occurred while validating the request body: ${e}, ${JSON.stringify(e)}`,
+      `${transactionID} Error occurred while validating the request body: ${e}, ${JSON.stringify(e)}`,
     );
 
-    handleValidationErrors(e, req.transactionID);
+    handleValidationErrors(e);
   }
 };

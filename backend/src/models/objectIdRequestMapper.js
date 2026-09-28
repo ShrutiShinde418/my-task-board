@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { z } from "zod";
 import { handleValidationErrors } from "../utils/helperMethods.js";
+import { getTransactionIdFromAsyncStore } from "../middlewares/startTransaction.js";
+
 
 /**
  * @function objectIdRequestMapper
@@ -8,16 +10,17 @@ import { handleValidationErrors } from "../utils/helperMethods.js";
  *              If the input is invalid, it delegates error handling to `handleValidationErrors`.
  *
  * @param {string} objectId - The ObjectId string to validate and sanitize.
- * @param {string} transactionID - A unique identifier for tracing the request, used in error handling.
  *
  * @returns {Promise<string>} A trimmed and validated ObjectId string.
  *
  * @throws {ErrorResponse} If the ObjectId is invalid or fails schema validation.
  */
-export const objectIdRequestMapper = async (objectId, transactionID) => {
+export const objectIdRequestMapper = async (objectId) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
     logger.debug(`${transactionID} Validating the ObjectID :: ${objectId}`);
-    
+
     const schema = z
       .string()
       .trim()
@@ -30,6 +33,6 @@ export const objectIdRequestMapper = async (objectId, transactionID) => {
 
     return await schema.parseAsync(objectId);
   } catch (error) {
-    handleValidationErrors(error, transactionID);
+    handleValidationErrors(error);
   }
 };

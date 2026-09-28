@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 import Task from "../models/Task.js";
 import Board from "../models/Board.js";
 import User from "../models/User.js";
@@ -9,6 +9,7 @@ import { createSuccessResponse } from "../models/responseMapper.js";
 import { handleValidationErrors } from "../utils/helperMethods.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
+import { getTransactionIdFromAsyncStore } from "../middlewares/startTransaction.js";
 
 /**
  * Controller to create a new task.
@@ -34,24 +35,26 @@ import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
  * @throws {ZodError} If the request body fails schema validation.
  */
 export const createTaskController = asyncHandler(async (req, res) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
-    logger.debug(`${req.transactionID} Inside createTaskController`);
+    logger.debug(`${transactionID} Inside createTaskController`);
 
     logger.debug(
-      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying is the userId in the token is present in the db`,
     );
 
     const user = await User.findById(res.locals.userId);
 
     if (!user) {
       logger.error(
-        `${req.transactionID} User does not exist, so throwing error`,
+        `${transactionID} User does not exist, so throwing error`,
       );
 
       throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
-    logger.debug(`${req.transactionID} Validating the request body`);
+    logger.debug(`${transactionID} Validating the request body`);
 
     const taskSchema = z
       .strictObject(
@@ -94,17 +97,17 @@ export const createTaskController = asyncHandler(async (req, res) => {
 
     const result = await taskSchema.parseAsync(req.body);
 
-    logger.debug(`${req.transactionID} Request body validated successfully`);
+    logger.debug(`${transactionID} Request body validated successfully`);
 
     logger.debug(
-      `${req.transactionID} Checking if the boardId ${result.boardId} exists in the database`,
+      `${transactionID} Checking if the boardId ${result.boardId} exists in the database`,
     );
 
     const doesBoardExist = await Board.findById(result.boardId);
 
     if (!doesBoardExist) {
       logger.error(
-        `${req.transactionID} The boardId ${result.boardId} does not exists in the database, throwing error`,
+        `${transactionID} The boardId ${result.boardId} does not exists in the database, throwing error`,
       );
 
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
@@ -119,7 +122,7 @@ export const createTaskController = asyncHandler(async (req, res) => {
     });
 
     logger.debug(
-      `${req.transactionID} Successfully created a new task, and appending it to the tasks array in the board`,
+      `${transactionID} Successfully created a new task, and appending it to the tasks array in the board`,
     );
 
     await Board.findByIdAndUpdate(result.boardId, {
@@ -127,12 +130,12 @@ export const createTaskController = asyncHandler(async (req, res) => {
     });
 
     logger.debug(
-      `${req.transactionID} Successfully pushed the taskID in the tasks array in the board, returning the new tasks created`,
+      `${transactionID} Successfully pushed the taskID in the tasks array in the board, returning the new tasks created`,
     );
 
     return res.send(createSuccessResponse(req, res, { task: newTask }));
   } catch (error) {
-    handleValidationErrors(error, req.transactionID);
+    handleValidationErrors(error);
   }
 });
 
@@ -164,30 +167,32 @@ export const createTaskController = asyncHandler(async (req, res) => {
  * @throws {ZodError} If the request body fails schema validation.
  */
 export const updateTaskController = asyncHandler(async (req, res) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
-    logger.debug(`${req.transactionID} Inside updateTaskController`);
+    logger.debug(`${transactionID} Inside updateTaskController`);
 
     logger.debug(
-      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying is the userId in the token is present in the db`,
     );
 
     const user = await User.findById(res.locals.userId);
 
     if (!user) {
       logger.error(
-        `${req.transactionID} User does not exist, so throwing error`,
+        `${transactionID} User does not exist, so throwing error`,
       );
 
       throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(
-      `${req.transactionID} Validating the ObjectID passed as params`,
+      `${transactionID} Validating the ObjectID passed as params`,
     );
 
-    await objectIdRequestMapper(req.params["taskId"], req.transactionID);
+    await objectIdRequestMapper(req.params["taskId"]);
 
-    logger.debug(`${req.transactionID} Validating the request body`);
+    logger.debug(`${transactionID} Validating the request body`);
 
     const taskSchema = z
       .strictObject(
@@ -227,7 +232,7 @@ export const updateTaskController = asyncHandler(async (req, res) => {
     const result = await taskSchema.parseAsync(req.body);
 
     logger.debug(
-      `${req.transactionID} Request body validated successfully and updating the task`,
+      `${transactionID} Request body validated successfully and updating the task`,
     );
 
     const updatedTask = await Task.findByIdAndUpdate(
@@ -242,7 +247,7 @@ export const updateTaskController = asyncHandler(async (req, res) => {
 
     return res.send(createSuccessResponse(req, res, { task: updatedTask }));
   } catch (error) {
-    handleValidationErrors(error, req.transactionID);
+    handleValidationErrors(error);
   }
 });
 
@@ -266,9 +271,11 @@ export const updateTaskController = asyncHandler(async (req, res) => {
  * @throws {ErrorResponse} If the task does not exist.
  */
 export const deleteTaskController = asyncHandler(async (req, res) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
     logger.debug(
-      `${req.transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying is the userId in the token is present in the db`,
     );
 
     const user = await User.findById(res.locals.userId).populate({
@@ -278,34 +285,34 @@ export const deleteTaskController = asyncHandler(async (req, res) => {
 
     if (!user) {
       logger.error(
-        `${req.transactionID} User does not exist, so throwing error`,
+        `${transactionID} User does not exist, so throwing error`,
       );
 
       throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(
-      `${req.transactionID} Validating the ObjectID passed as params`,
+      `${transactionID} Validating the ObjectID passed as params`,
     );
 
-    await objectIdRequestMapper(req.params["taskId"], req.transactionID);
+    await objectIdRequestMapper(req.params["taskId"]);
 
     logger.debug(
-      `${req.transactionID} Deleting the task with ID ${req.params["taskId"]}`,
+      `${transactionID} Deleting the task with ID ${req.params["taskId"]}`,
     );
 
     const deleteTask = await Task.findByIdAndDelete(req.params["taskId"]);
 
     if (!deleteTask) {
       logger.error(
-        `${req.transactionID} The task does not exist, so throwing error`,
+        `${transactionID} The task does not exist, so throwing error`,
       );
 
       throw new ErrorResponse(constants.RESOURCE_DOES_NOT_EXIST, 404);
     }
 
     logger.debug(
-      `${req.transactionID} Removing the taskID from the tasks array from the board`,
+      `${transactionID} Removing the taskID from the tasks array from the board`,
     );
 
     await Board.findByIdAndUpdate(deleteTask.board, {
@@ -313,7 +320,7 @@ export const deleteTaskController = asyncHandler(async (req, res) => {
     });
 
     logger.debug(
-      `${req.transactionID} Successfully deleted the task with ID ${req.params["taskId"]} and removed it from the board ${deleteTask.board}`,
+      `${transactionID} Successfully deleted the task with ID ${req.params["taskId"]} and removed it from the board ${deleteTask.board}`,
     );
 
     return res.send(
@@ -322,6 +329,6 @@ export const deleteTaskController = asyncHandler(async (req, res) => {
       }),
     );
   } catch (error) {
-    handleValidationErrors(error, req.transactionID);
+    handleValidationErrors(error);
   }
 });

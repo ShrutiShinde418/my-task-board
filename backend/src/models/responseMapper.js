@@ -1,3 +1,6 @@
+import { getTransactionIdFromAsyncStore } from "../middlewares/startTransaction.js";
+
+
 /**
  * Create a standardized error response object.
  *
@@ -13,10 +16,12 @@
  * @returns {{ success: boolean, error: any }} Standardized error response object.
  */
 export const createErrorResponse = (req, res, exception, statusCode) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   if (exception.name === "ErrorResponse") delete exception.name;
 
   logger.error(
-    `${req.transactionID} Exception :: ${exception}, ${JSON.stringify(exception)}`,
+    `${transactionID} Exception :: ${exception}, ${JSON.stringify(exception)}`,
   );
 
   const data = {
@@ -43,12 +48,14 @@ export const createErrorResponse = (req, res, exception, statusCode) => {
  * @returns {{ success: boolean, data: any }} Standardized success response object.
  */
 export const createSuccessResponse = (req, res, data) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   const response = {
     success: true,
     ...data,
   };
 
-  logger.debug(`${req.transactionID} Response Data :: ${JSON.stringify(data)}`);
+  logger.debug(`${transactionID} Response Data :: ${JSON.stringify(data)}`);
 
   res.status(200);
 

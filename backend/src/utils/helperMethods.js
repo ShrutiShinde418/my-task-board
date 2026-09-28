@@ -3,6 +3,8 @@ import { promisify } from "node:util";
 import { ZodError } from "zod";
 import ErrorResponse from "./errorResponse.js";
 import constants from "./constants.js";
+import { getTransactionIdFromAsyncStore } from "../middlewares/startTransaction.js";
+
 
 const pbkdf2 = promisify(crypto.pbkdf2);
 
@@ -64,11 +66,12 @@ export const decryptData = async function (encryptedString, password) {
  *
  * @function handleValidationErrors
  * @param {Error|import("zod").ZodError|ErrorResponse} error - The error thrown during validation or execution.
- * @param {string} transactionID - Unique transaction identifier for tracking/logging.
  *
  * @throws {ErrorResponse} Normalized error response depending on error type.
  */
-export const handleValidationErrors = (error, transactionID) => {
+export const handleValidationErrors = (error) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   logger.error(`${transactionID} Inside handleValidationErrors method`);
 
   if (error.name === "ErrorResponse") {

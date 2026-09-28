@@ -328,7 +328,7 @@ describe("Integration Tests for login controller", () => {
       assert.isNotEmpty(loginResponse.headers["set-cookie"]);
       assert.include(loginResponse.headers["set-cookie"][0], "auth_session");
       assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");
-      assert.include(loginResponse.headers["set-cookie"][0], "SameSite=None");
+      assert.include(loginResponse.headers["set-cookie"][0], "SameSite=Lax");
 
       const removeUserResponse = await request(app)
         .post(`/api/remove/user/${userId}`)

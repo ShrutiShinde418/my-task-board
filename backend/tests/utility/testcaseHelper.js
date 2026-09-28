@@ -6,7 +6,7 @@ import app from "../../src/index.js";
 export const objectIdRegex = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i;
 
 export class TestcaseHelper {
-  async createUser() {
+  async createUser () {
     const requestBody = {
       email: `testuser${Math.floor(Math.random() * 90000 + 10000)}@gmail.com`,
       password: `sdfkd@svff${Math.floor(Math.random() * 90000 + 10000)}`,
@@ -43,7 +43,7 @@ export class TestcaseHelper {
     assert.isNotEmpty(loginResponse.headers["set-cookie"]);
     assert.include(loginResponse.headers["set-cookie"][0], "auth_session");
     assert.include(loginResponse.headers["set-cookie"][0], "HttpOnly;");
-    assert.include(loginResponse.headers["set-cookie"][0], "SameSite=None");
+    assert.include(loginResponse.headers["set-cookie"][0], "SameSite=Lax");
 
     return {
       email: requestBody.email,
@@ -54,7 +54,7 @@ export class TestcaseHelper {
     };
   }
 
-  async removeUser(userId) {
+  async removeUser (userId) {
     const removeUserResponse = await request(app)
       .post(`/api/remove/user/${userId}`)
       .set("Content-Type", "application/json");
@@ -66,7 +66,7 @@ export class TestcaseHelper {
     return { userId };
   }
 
-  async createBoard(token) {
+  async createBoard (token) {
     const createBoardResponse = await request(app)
       .post("/api/boards")
       .set("Content-Type", "application/json")
@@ -82,7 +82,7 @@ export class TestcaseHelper {
     return { boardId: createBoardResponse.body.boardId };
   }
 
-  async createSingleRandomTaskHandler(boardId, token) {
+  async createSingleRandomTaskHandler (boardId, token) {
     const requestBody = {
       boardId,
       name: randomString.generate({
@@ -112,7 +112,7 @@ export class TestcaseHelper {
     };
   }
 
-  async createNTasksHandler(boardId, token, noOfTasks) {
+  async createNTasksHandler (boardId, token, noOfTasks) {
     const taskIdsArray = [];
 
     for (let i = 0; i < noOfTasks; i++) {
@@ -143,7 +143,7 @@ export class TestcaseHelper {
     return { taskIdsArray, boardId, token };
   }
 
-  async createUserWithBoard() {
+  async createUserWithBoard () {
     const userDetails = await this.createUser();
 
     const boardDetails = await this.createBoard(userDetails.token);
@@ -154,7 +154,7 @@ export class TestcaseHelper {
     };
   }
 
-  async createMBoardsAndNTasksHandler(noOfBoards, noOfTasks) {
+  async createMBoardsAndNTasksHandler (noOfBoards, noOfTasks) {
     const userDetails = await this.createUser();
     const boardIdsArray = [];
     const tasksIdsArray = [];

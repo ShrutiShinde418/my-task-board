@@ -10,6 +10,7 @@ import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
 import Task from "../models/Task.js";
 import Board from "../models/Board.js";
 import { encryptData } from "../utils/helperMethods.js";
+import { getTransactionIdFromAsyncStore } from '../middlewares/startTransaction.js'
 
 /**
  * Controller to sign up a user
@@ -25,20 +26,22 @@ import { encryptData } from "../utils/helperMethods.js";
  * @throws {Error} If signing up the user fails, the error is propagated to the error handler
  */
 export const signup = asyncHandler(async (req, res) => {
-  try {
-    logger.debug(`${req.transactionID} Inside signup controller`);
+  const transactionID = getTransactionIdFromAsyncStore();
 
-    logger.debug(`${req.transactionID} Validating the request body`);
+  try {
+    logger.debug(`${transactionID} Inside signup controller`);
+
+    logger.debug(`${transactionID} Validating the request body`);
 
     const result = await authRequestMapper(req);
 
-    logger.debug(`${req.transactionID} Request body validated successfully`);
+    logger.debug(`${transactionID} Request body validated successfully`);
 
     const existingUser = await User.findOne({ email: result.email });
 
     if (existingUser) {
       logger.error(
-        `${req.transactionID} User already exists with ID ${existingUser._id}, so throwing error`,
+        `${transactionID} User already exists with ID ${existingUser._id}, so throwing error`,
       );
 
       throw new ErrorResponse(constants.USER_ALREADY_EXISTS, 423);
@@ -59,7 +62,7 @@ export const signup = asyncHandler(async (req, res) => {
     });
 
     logger.debug(
-      `${req.transactionID} Successfully created new user with email: ${result.email}`,
+      `${transactionID} Successfully created new user with email: ${result.email}`,
     );
 
     return res.send(
@@ -86,10 +89,12 @@ export const signup = asyncHandler(async (req, res) => {
  * @throws {Error} If signing up the user fails, the error is propagated to the error handler
  */
 export const login = asyncHandler(async (req, res) => {
-  try {
-    logger.debug(`${req.transactionID} Inside login controller`);
+  const transactionID = getTransactionIdFromAsyncStore();
 
-    logger.debug(`${req.transactionID} Validating the request body`);
+  try {
+    logger.debug(`${transactionID} Inside login controller`);
+
+    logger.debug(`${transactionID} Validating the request body`);
 
     const result = await authRequestMapper(req);
 
@@ -98,11 +103,11 @@ export const login = asyncHandler(async (req, res) => {
       populate: { path: "tasks" },
     });
 
-    logger.debug(`${req.transactionID} Request body validated successfully`);
+    logger.debug(`${transactionID} Request body validated successfully`);
 
     if (!existingUser) {
       logger.error(
-        `${req.transactionID} User does not exist, so throwing error`,
+        `${transactionID} User does not exist, so throwing error`,
       );
 
       throw new ErrorResponse(constants.EMAIL_OR_PASSWORD_IS_INVALID, 425);
@@ -115,14 +120,14 @@ export const login = asyncHandler(async (req, res) => {
 
     if (!doesPasswordMatch) {
       logger.error(
-        `${req.transactionID} Email or password doesn't match, so throwing error`,
+        `${transactionID} Email or password doesn't match, so throwing error`,
       );
 
       throw new ErrorResponse(constants.EMAIL_OR_PASSWORD_IS_INVALID, 425);
     }
 
     logger.debug(
-      `${req.transactionID} Create JWT token to be stored as a cookie`,
+      `${transactionID} Create JWT token to be stored as a cookie`,
     );
 
     const token = await new SignJWT({
@@ -142,13 +147,13 @@ export const login = asyncHandler(async (req, res) => {
         path: "/",
         secure: process.env.NODE_ENV === "prod",
         // sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax',
         maxAge: Number(process.env.TOKEN_EXPIRY[0]) * 24 * 60 * 60 * 1000,
       },
     );
 
     logger.debug(
-      `${req.transactionID} User with id ${existingUser._id} logged in successfully`,
+      `${transactionID} User with id ${existingUser._id} logged in successfully`,
     );
 
     return res.send(
@@ -178,8 +183,10 @@ export const login = asyncHandler(async (req, res) => {
  * @throws {Error} If signing up the user fails, the error is propagated to the error handler
  */
 export const getUserDetails = asyncHandler(async (req, res) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
-    logger.debug(`${req.transactionID} Inside getUserDetails controller`);
+    logger.debug(`${transactionID} Inside getUserDetails controller`);
 
     const existingUser = await User.findById(res.locals.userId).populate({
       path: "boards",
@@ -188,14 +195,14 @@ export const getUserDetails = asyncHandler(async (req, res) => {
 
     if (!existingUser) {
       logger.error(
-        `${req.transactionID} User doesn't exist, so throwing an error`,
+        `${transactionID} User doesn't exist, so throwing an error`,
       );
 
       throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
     }
 
     logger.debug(
-      `${req.transactionID} Fetched user details with id ${existingUser._id} successfully`,
+      `${transactionID} Fetched user details with id ${existingUser._id} successfully`,
     );
 
     return res.send(
@@ -225,17 +232,19 @@ export const getUserDetails = asyncHandler(async (req, res) => {
  * @throws {Error} If removing the user fails, the error is propagated to the error handler
  */
 export const removeUser = asyncHandler(async (req, res) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
   try {
-    logger.debug(`${req.transactionID} Inside removeUser controller`);
+    logger.debug(`${transactionID} Inside removeUser controller`);
 
     logger.debug(
-      `${req.transactionID} Validating the ObjectID passed as params`,
+      `${transactionID} Validating the ObjectID passed as params`,
     );
 
-    await objectIdRequestMapper(req.params.userId, req.transactionID);
+    await objectIdRequestMapper(req.params.userId);
 
     logger.debug(
-      `${req.transactionID} Request body has been successfully validated`,
+      `${transactionID} Request body has been successfully validated`,
     );
 
     const removeUser = await User.findByIdAndDelete(req.params.userId).populate(
@@ -247,7 +256,7 @@ export const removeUser = asyncHandler(async (req, res) => {
 
     if (!removeUser) {
       logger.error(
-        `${req.transactionID} User with ID ${req.params.userId} not found, throwing an error`,
+        `${transactionID} User with ID ${req.params.userId} not found, throwing an error`,
       );
 
       throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
@@ -262,7 +271,7 @@ export const removeUser = asyncHandler(async (req, res) => {
     }, []);
 
     logger.debug(
-      `${req.transactionID} Removing tasks :: ${taskIdsArray ?? "None present"} associated with the user`,
+      `${transactionID} Removing tasks :: ${taskIdsArray ?? "None present"} associated with the user`,
     );
 
     const deletedTasks = await Task.deleteMany({
@@ -270,7 +279,7 @@ export const removeUser = asyncHandler(async (req, res) => {
     });
 
     logger.debug(
-      `${req.transactionID} Removing boards :: ${boardIds ?? "None present"} associated with the user`,
+      `${transactionID} Removing boards :: ${boardIds ?? "None present"} associated with the user`,
     );
 
     const deletedBoards = await Board.deleteMany({
@@ -278,7 +287,7 @@ export const removeUser = asyncHandler(async (req, res) => {
     });
 
     logger.debug(
-      `${req.transactionID} User with id ${removeUser._id} removed successfully with ${deletedBoards.deletedCount ?? 0} board(s) deleted and ${deletedTasks.deletedCount ?? 0} task(s) deleted`,
+      `${transactionID} User with id ${removeUser._id} removed successfully with ${deletedBoards.deletedCount ?? 0} board(s) deleted and ${deletedTasks.deletedCount ?? 0} task(s) deleted`,
     );
 
     return res.send(
@@ -309,10 +318,15 @@ export const removeUser = asyncHandler(async (req, res) => {
  */
 
 export const logout = asyncHandler(async (req, res) => {
-  try {
-    logger.debug(`${req.transactionID} Inside logout controller`);
+  const transactionID = getTransactionIdFromAsyncStore();
 
-    res.clearCookie("token");
+  try {
+    logger.debug(`${transactionID} Inside logout controller`);
+
+    const cookieName = process.env.NODE_ENV === "prod" ? "__Host-session_id" : "auth_session";
+
+    res.clearCookie(cookieName);
+
     return res.send(
       createSuccessResponse(req, res, {
         message: `Logged out successfully`,
@@ -343,13 +357,12 @@ export const logout = asyncHandler(async (req, res) => {
  */
 export const updateLastVisitedBoardController = asyncHandler(
   async (req, res) => {
-    try {
-      logger.debug(`${req.transactionID} Inside updateUser controller`);
+    const transactionID = getTransactionIdFromAsyncStore();
 
-      const boardId = await objectIdRequestMapper(
-        req.body.boardId,
-        req.transactionID,
-      );
+    try {
+      logger.debug(`${transactionID} Inside updateUser controller`);
+
+      const boardId = await objectIdRequestMapper(req.body.boardId);
 
       const board = await Board.findById(boardId);
 
