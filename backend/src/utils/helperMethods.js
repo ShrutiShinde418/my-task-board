@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import ErrorResponse from "./errorResponse.js";
 import constants from "./constants.js";
 import { getTransactionIdFromAsyncStore } from "../middlewares/startTransaction.js";
+import User from "../models/User.js";
 
 
 const pbkdf2 = promisify(crypto.pbkdf2);
@@ -90,3 +91,30 @@ export const handleValidationErrors = (error) => {
     throw new ErrorResponse(constants.INTERNAL_COMMUNICATION_EXCEPTION, 500);
   }
 };
+
+/**
+ * Checks if the user with the given ID exists in the database.
+ * 
+ * @param {string} userId unique identifier of the user
+ * 
+ * @returns {Promise<User>} The user document if found
+ * 
+ * @throws {ErrorResponse} If the user does not exist
+ */
+export const checkIfUserExists = async (userId) => {
+  const transactionID = getTransactionIdFromAsyncStore();
+
+  logger.debug(`${transactionID} Checking if user with ID ${userId} exists in the DB`);
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    logger.error(
+      `${transactionID} User does not exist, so throwing error`,
+    );
+
+    throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
+  }
+
+  return user;
+}

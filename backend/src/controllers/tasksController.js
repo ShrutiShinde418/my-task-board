@@ -10,6 +10,7 @@ import { handleValidationErrors } from "../utils/helperMethods.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
 import { getTransactionIdFromAsyncStore } from "../middlewares/startTransaction.js";
+import { checkIfUserExists } from '../utils/helperMethods.js';
 
 /**
  * Controller to create a new task.
@@ -41,18 +42,10 @@ export const createTaskController = asyncHandler(async (req, res) => {
     logger.debug(`${transactionID} Inside createTaskController`);
 
     logger.debug(
-      `${transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying whether the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId);
-
-    if (!user) {
-      logger.error(
-        `${transactionID} User does not exist, so throwing error`,
-      );
-
-      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
-    }
+    await checkIfUserExists(res.locals.userId);
 
     logger.debug(`${transactionID} Validating the request body`);
 
@@ -173,18 +166,10 @@ export const updateTaskController = asyncHandler(async (req, res) => {
     logger.debug(`${transactionID} Inside updateTaskController`);
 
     logger.debug(
-      `${transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying whether the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId);
-
-    if (!user) {
-      logger.error(
-        `${transactionID} User does not exist, so throwing error`,
-      );
-
-      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
-    }
+    await checkIfUserExists(res.locals.userId);
 
     logger.debug(
       `${transactionID} Validating the ObjectID passed as params`,
@@ -275,21 +260,10 @@ export const deleteTaskController = asyncHandler(async (req, res) => {
 
   try {
     logger.debug(
-      `${transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying whether the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId).populate({
-      path: "boards",
-      populate: { path: "tasks" },
-    });
-
-    if (!user) {
-      logger.error(
-        `${transactionID} User does not exist, so throwing error`,
-      );
-
-      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
-    }
+    await checkIfUserExists(res.locals.userId);
 
     logger.debug(
       `${transactionID} Validating the ObjectID passed as params`,

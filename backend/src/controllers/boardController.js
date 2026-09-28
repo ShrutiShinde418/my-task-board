@@ -3,7 +3,7 @@ import { z } from "zod";
 import ErrorResponse from "../utils/errorResponse.js";
 import constants from "../utils/constants.js";
 import Board from "../models/Board.js";
-import { handleValidationErrors } from "../utils/helperMethods.js";
+import { checkIfUserExists, handleValidationErrors } from "../utils/helperMethods.js";
 import { createSuccessResponse } from "../models/responseMapper.js";
 import { objectIdRequestMapper } from "../models/objectIdRequestMapper.js";
 import User from "../models/User.js";
@@ -34,18 +34,10 @@ export const createBoardController = asyncHandler(async (req, res) => {
     );
 
     logger.debug(
-      `${transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying whether the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId);
-
-    if (!user) {
-      logger.error(
-        `${transactionID} User does not exist, so throwing error`,
-      );
-
-      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
-    }
+    const user = await checkIfUserExists(res.locals.userId);
 
     logger.debug(`${transactionID} Creating a new board`);
 
@@ -93,18 +85,10 @@ export const getBoardController = asyncHandler(async (req, res) => {
     logger.debug(`${transactionID} Inside getBoardController controller`);
 
     logger.debug(
-      `${transactionID} Verifying is the userId in the token is present in the db`,
+      `${transactionID} Verifying whether the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId);
-
-    if (!user) {
-      logger.error(
-        `${transactionID} User does not exist, so throwing error`,
-      );
-
-      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
-    }
+    await checkIfUserExists(res.locals.userId);
 
     logger.debug(
       `${transactionID} Validating the ObjectID passed as params`,
@@ -163,15 +147,7 @@ export const updateBoardController = asyncHandler(async (req, res) => {
       `${transactionID} Verifying is the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId);
-
-    if (!user) {
-      logger.error(
-        `${transactionID} User does not exist, so throwing error`,
-      );
-
-      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
-    }
+    await checkIfUserExists(res.locals.userId);
 
     logger.debug(
       `${transactionID} Validating the object ID ${req.params.boardId} passed as params`,
@@ -264,15 +240,7 @@ export const deleteBoardController = asyncHandler(async (req, res) => {
       `${transactionID} Verifying is the userId in the token is present in the db`,
     );
 
-    const user = await User.findById(res.locals.userId);
-
-    if (!user) {
-      logger.error(
-        `${transactionID} User does not exist, so throwing error`,
-      );
-
-      throw new ErrorResponse(constants.SOMETHING_WENT_WRONG, 424);
-    }
+    const user = await checkIfUserExists(res.locals.userId);
 
     logger.debug(
       `${transactionID} Validating the objectID passed as params`,
